@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Word lock/temp files
+~$*.docx
+
+# Obsidian: track the portable vault config (app/appearance/core-plugins),
+# ignore per-machine workspace state, installed plugins, and caches.
+**/.obsidian/workspace.json
+**/.obsidian/workspace-mobile.json
+**/.obsidian/plugins/
+**/.obsidian/cache
