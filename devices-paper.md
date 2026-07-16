@@ -432,7 +432,7 @@ unsupported patient to full mechanical and extracorporeal support.
 ## References
 
 *In order of appearance (Vancouver, matching the companion papers). PMIDs verified against PubMed
-(`thesis/_references.md`, 2026-07-12). Companion papers are cited as unnumbered [P5]/[P6] tokens. The
+(`_references.md`, 2026-07-12). Companion papers are cited as unnumbered [P5]/[P6] tokens. The
 ECMO membrane oxygenator (Eq. 13) reuses the respiratory paper's partial-pressure gas-exchange law
 [P2]; that derivation and its citations live there.*
 

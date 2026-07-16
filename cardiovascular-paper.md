@@ -10,7 +10,7 @@ Word manuscript `ExplainCircPaper(27012026)_WPdB_TA_WvM.docx`, with the AI-param
 compact-highlight (Box 1, Fig. 6, refs [24]–[26]) folded in. Equations are transcribed to the
 series' Unicode-blockquote convention and are to be re-keyed as native Word (OMML) objects at
 assembly; each equation block names the engine source file it is checked against. The verified
-reference list (PubMed, 2026-07-16) is carried in `thesis/P1_references_verified.md`.*
+reference list (PubMed, 2026-07-16) is carried in `P1_references_verified.md`.*
 
 ---
 
@@ -86,7 +86,7 @@ Figure 1 shows the main models and causal relationships underlying EXPLAIN. Over
 outputs of the integrated model, such as the fraction of inspired oxygen and the ECG, are not
 represented in this figure.
 
-**Fig. 1** (`thesis/Fig1_cardiovascular_blockdiagram.svg`). Block diagram of the integrated
+**Fig. 1** (`Fig1_cardiovascular_blockdiagram.svg`). Block diagram of the integrated
 cardiorespiratory model, adapted from van Meurs [10].
 
 The two bottom blocks of Figure 1 reflect blood flow and control of circulation, and the two top
@@ -115,7 +115,7 @@ hemodynamics model. The basis for this model is the one given by Beneken [12] (s
 al. [13]), expanded by the specific tissue groups and neonatal shunts that are needed to simulate
 the neonatal conditions mentioned in the introduction.
 
-**Fig. 2** (`thesis/Fig2_cardiovascular_hydraulic_circuit.svg`). Hydraulic-circuit representation
+**Fig. 2** (`Fig2_cardiovascular_hydraulic_circuit.svg`). Hydraulic-circuit representation
 of neonatal hemodynamics. See Table 1 for the symbols used and their mathematical description.
 Intra-thoracic components are indicated in blue and extra-thoracic components in black. Components
 located inside the pericardium have a light-grey background. Dashed lines represent shunts that are
@@ -311,7 +311,7 @@ CV_min its maximum and minimum values. To represent the finite adaptation time o
 activation is low-pass-filtered using a discrete-time first-order filter with receptor time constant
 τ_cv, resulting in a filtered activation *a*.
 
-**Fig. 4** (`thesis/Fig4_cardiovascular_activation_function.svg`). Activation function, adapted from
+**Fig. 4** (`Fig4_cardiovascular_activation_function.svg`). Activation function, adapted from
 van Meurs [10]. The receptor activation af is zero at the setpoint CV_sp and saturates at its
 minimum and maximum activation levels for controlled-variable values below CV_min and above CV_max.
 
@@ -488,7 +488,7 @@ the paradoxical reduction in LVO seen with bidirectional shunting, allowing furt
 this finding. The model also generates Doppler and instantaneous flow patterns during ductal closure;
 Figure 5 compares simulation outputs with published transductal Doppler data.
 
-**Fig. 5** (`thesis/Fig5_cardiovascular_pda_doppler_bidirectional.png`,
+**Fig. 5** (`Fig5_cardiovascular_pda_doppler_bidirectional.png`,
 `Fig5_cardiovascular_pda_doppler_nonrestrictive.png`, `Fig5_cardiovascular_pda_doppler_restrictive.png`).
 Target PDA Doppler flow-rate data from van Laere et al. [22] (left) and EXPLAIN simulation results
 (right), for bidirectional, non-restrictive left-to-right, and restrictive left-to-right transductal
@@ -566,7 +566,7 @@ hand but by an AI-assisted, closed-loop pipeline (Box 1; Fig. 6; companion paper
 patient-specific instantiation reproducible and keeps every automated adjustment within the same
 bounds as a manual edit.
 
-**Fig. 6** (`thesis/Fig6_AI_parameterization.png`, `thesis/Fig6_AI_parameterization.svg`).
+**Fig. 6** (`Fig6_AI_parameterization.png`, `Fig6_AI_parameterization.svg`).
 AI-assisted patient-specific parameterization (Box 1). An LLM agent interprets the available clinical
 targets (*x\**) and emits a validated specification and allowlisted commands; it does not modify
 equations or state directly. A deterministic calibrator then fits the mechanistic model: a single
@@ -636,7 +636,7 @@ Healthcare. None of the other authors have a potential conflict of interest to r
 ## References
 
 *In order of appearance (Vancouver, matching the series). Verified against PubMed on 2026-07-16 (full
-provenance and actionable findings in `thesis/P1_references_verified.md`). Refs 10, 12 and 15 are a
+provenance and actionable findings in `P1_references_verified.md`). Refs 10, 12 and 15 are a
 textbook, a 1965 dissertation and a 1920 pre-MEDLINE paper respectively and are correctly not in
 PubMed. The AI-parameterization references [24]–[26] enter as a coupled insertion with Box 1 and the
 inline [24] anchors; [24] is blocked on the P6 preprint DOI (placeholder retained).*

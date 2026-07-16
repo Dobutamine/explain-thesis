@@ -503,7 +503,7 @@ by hand.
 ## References
 
 *In order of appearance (Vancouver, matching the companion papers). PMIDs verified against PubMed
-(`thesis/_references.md`, confirmed 2026-07-12) unless marked as a historical/textbook source.
+(`_references.md`, confirmed 2026-07-12) unless marked as a historical/textbook source.
 Companion papers are cited as unnumbered [P1]–[P7] tokens. Anchors shared with the cardiovascular
 paper (Beneken & DeWit, Suga, van Meurs) are reused verbatim there and not repeated here. The
 cerebral haemodynamics / intracranial-pressure references (Alderliesten 2012, Massaro 2015,

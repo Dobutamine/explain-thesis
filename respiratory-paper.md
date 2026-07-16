@@ -54,7 +54,7 @@ gradients. The blood carries O₂ and CO₂ as total contents (*t*O₂, *t*CO₂
 acid–base and oxygen-transport solver (`BloodComposition`) converts these contents, together with the plasma strong ions, into partial pressures, pH, bicarbonate, base excess and haemoglobin saturation everywhere blood exists. As blood circulates, tissue metabolism (`Metabolism`) removes O₂ and adds CO₂ in proportion to each organ's share of whole-body oxygen consumption, and — when tissue oxygenation falls below an anaerobic threshold — a lactate model (`Lactate`) produces lactate, which the same acid–base solver reads as a strong anion, producing a lactic metabolic acidosis. Finally, a surfactant/recruitment model (`Surfactant`) makes alveolar compliance, functional residual capacity, diffusion and intrapulmonary shunt depend dynamically on transpulmonary pressure and surfactant maturity, reproducing respiratory distress syndrome (RDS)and its treatment.
 
 
-**Fig. 1** (`thesis/Fig1_respiratory_subsystem.svg`, editable vector source; PNG export
+**Fig. 1** (`Fig1_respiratory_subsystem.svg`, editable vector source; PNG export
 `Fig1_respiratory_subsystem.png` for the manuscript). 
 Schematic of the neonatal respiratory subsystem and its couplings. Inspired gas passes from the airway opening (`MOUTH`, fixed at atmospheric composition and FiO₂) through the anatomical dead space (`DS`) — with upper- and
 lower-airway resistances — into the left and right alveolar gas compartments (`ALL`, `ALR`) enclosed
@@ -488,6 +488,6 @@ assembly. PMIDs verified against PubMed unless marked as a historical primary so
 14. Antonius T. *Explain: a whole-body physiological simulation engine* (Version v0.1.0) [Software]. Zenodo; 2026. doi:10.5281/zenodo.21389097 (concept/all-versions DOI). Source: https://github.com/Dobutamine/explain-engine (MIT). Interactive model: https://explain-modeling.com.
 15. Wagner PD, Saltzman HA, West JB. Measurement of continuous distributions of ventilation–perfusion ratios: theory. *J Appl Physiol.* 1974;36(5):588–99. PMID 4826323. doi:10.1152/jappl.1974.36.5.588.
 
-*Full working pool and provenance notes: `thesis/_references.md`. The AI-use disclosure and the
+*Full working pool and provenance notes: `_references.md`. The AI-use disclosure and the
 parameterization-method citations are carried by the companion paper [P6]; this paper's §2.4 is a
 pointer, so it does not re-cite the LLM/software-method sources.*

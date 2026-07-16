@@ -10,15 +10,14 @@ whole-body neonatal physiological simulation engine.
 ## Layout
 
 ```
-explain-thesis/
-├── thesis/          ← the manuscripts, figures, and paper series (Obsidian vault root)
-│   └── pediatric-research-plan/
-└── explain-engine/  ← git submodule: github.com/Dobutamine/explain-engine
+explain-thesis/            ← the manuscripts and figures (Obsidian vault root)
+├── pediatric-research-plan/
+└── explain-engine/        ← git submodule: github.com/Dobutamine/explain-engine
 ```
 
-`thesis/` is the **Obsidian vault root** — open that folder, not the repository root.
-Keeping the vault one level down is deliberate: it keeps the engine submodule's source
-tree out of Obsidian's index, search, and graph view.
+The **repository root is the Obsidian vault root** — open this folder directly. The engine
+submodule is kept out of Obsidian's search, graph view, and quick switcher by the
+`userIgnoreFilters` entry in `.obsidian/app.json` (tracked, so it travels with the repo).
 
 `explain-engine` is the simulation engine the thesis describes — a standalone, citable,
 MIT-licensed repository, pinned here as a submodule so every number and figure in the
@@ -42,7 +41,7 @@ git submodule update --init
 from the SA campaign results committed in the engine repo:
 
 ```bash
-node explain-engine/scripts/sa/plot_sa.mjs --out thesis/
+node explain-engine/scripts/sa/plot_sa.mjs --out .
 ```
 
 The script is dependency-free and deterministic — a clean run leaves `git status`
@@ -62,4 +61,6 @@ they document; moving them is an open follow-up.
 ## History
 
 Extracted from the `explain-ui` repository with `git-filter-repo`, preserving the full
-drafting history of `thesis/`.
+drafting history of the manuscripts. They lived under a `thesis/` subfolder — in that
+repository and initially here — and were flattened to the repository root afterwards, so
+tracing a file past that point needs `git log --follow`.

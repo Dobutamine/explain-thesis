@@ -118,7 +118,7 @@ Cerebral autoregulation and its failure underlie much of the neurological morbid
 
 ## References
 
-*In order of appearance; PMIDs PubMed-verified (`thesis/_references.md`). Companion-paper citations [P1]–[P7] to be replaced with the series references/DOIs at assembly (cite [P6] as its bioRxiv preprint).*
+*In order of appearance; PMIDs PubMed-verified (`_references.md`). Companion-paper citations [P1]–[P7] to be replaced with the series references/DOIs at assembly (cite [P6] as its bioRxiv preprint).*
 
 1. Alderliesten T, Lemmers PMA, Smarius JJM, van de Vosse RE, Baerts W, van Bel F. Cerebral oxygenation, extraction, and autoregulation in very preterm infants who develop peri-intraventricular hemorrhage. *J Pediatr.* 2012;162(4):698–704.e2. PMID 23140883.
 2. Massaro AN, Govindan RB, Vezina G, Chang T, Andescavage NN, Wang Y, et al. Impaired cerebral autoregulation and brain injury in newborns with hypoxic-ischemic encephalopathy treated with hypothermia. *J Neurophysiol.* 2015;114(2):818–24. PMID 26063779.

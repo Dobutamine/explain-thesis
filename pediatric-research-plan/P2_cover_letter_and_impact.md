@@ -1,6 +1,6 @@
 # P2 (Respiratory) — cover letter + Impact Statement for Pediatric Research
 
-*Wave-1 companion to P1. Manuscript: "An integrated model for simulation of neonatal physiology: the respiratory system, gas exchange and metabolism" (Antonius TAJ, van Meurs WL, Westerhof BE, de Boode WP). Article type: **Basic Science Article**. Drafted 2026-07-12 from `thesis/respiratory-paper.md`. Series-wide decisions applied: corresponding author = Antonius; public code deposit; no ECI framing; compact AI-param highlight (full method in P6). `‹slots›` to finalize before sending.*
+*Wave-1 companion to P1. Manuscript: "An integrated model for simulation of neonatal physiology: the respiratory system, gas exchange and metabolism" (Antonius TAJ, van Meurs WL, Westerhof BE, de Boode WP). Article type: **Basic Science Article**. Drafted 2026-07-12 from `respiratory-paper.md`. Series-wide decisions applied: corresponding author = Antonius; public code deposit; no ECI framing; compact AI-param highlight (full method in P6). `‹slots›` to finalize before sending.*
 
 > **✅ Two P2 manuscript consistency edits DONE 2026-07-12** (in `respiratory-paper.md`): **(1)** §2.3 source-availability updated from "available upon request" to the **public-deposit** statement (deposit slots filled 2026-07-16). **(2)** §2.4 (and the intro pointer) repointed from "Section 2.4 of the cardiovascular paper" to the **companion parameterization paper [P6]** and P1's **Box 1**. Nothing further needed in the manuscript ; the deposit URL/DOI are now filled (2026-07-16).
 

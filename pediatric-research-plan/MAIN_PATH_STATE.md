@@ -69,10 +69,10 @@ Legend: ✅ done · ◐ partial · ✗ not started · 🔒 blocked (dependency).
 
 ## 6. File inventory (where everything lives)
 
-**Plan folder `thesis/pediatric-research-plan/`:**
+**Plan folder `pediatric-research-plan/`:**
 `PR_ARTICLE_SLATE.md` (programme) · `series_blocks.md` (reusable blocks) · `A2_ai-parameterization_frontmatter.md` (P6 front-matter) · `P1_cover_letter_and_impact.md` · `P1_ai-param_insertions.md` · `P2_…` · `P3a_…` · `P3b_…` · `P4_…` · `P5_…` · `P6_cover_letter_and_impact.md` · `P7_cover_letter_and_impact.md` · `P8_review_preinquiry.md` · **`MAIN_PATH_STATE.md` (this file)**.
 
-**Manuscripts + shared, in `thesis/`:**
+**Manuscripts + shared, in the repo root:**
 `ExplainCircPaper(27012026)_WPdB_TA_WvM.docx` (P1) · `respiratory-paper.md` (P2) · `other-systems-paper.md` (P3) · `devices-paper.md` (P4) · `ai-parameterization-paper.md` (P6) · `chd-paper.md` (P7) · `thesis-ch7-virtual-patient-library.md` (P5 source) · `_references.md` (verified pool) · `_shared-methods.md` · `circ-paper-additions.md` (P1 insert blocks).
 
 ---

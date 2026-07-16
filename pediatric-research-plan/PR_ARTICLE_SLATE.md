@@ -1,6 +1,6 @@
 # Publishing Explain in *Pediatric Research* — a combined submission programme
 
-*Publication-strategy proposal. Companion to `thesis/THESIS_BLUEPRINT.md`. Created 2026-07-12; revised to a single combined programme.*
+*Publication-strategy proposal. Companion to `THESIS_BLUEPRINT.md`. Created 2026-07-12; revised to a single combined programme.*
 
 ## Context
 

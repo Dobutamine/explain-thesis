@@ -1,6 +1,6 @@
 # AI-parameterization paper (P6; slate labels A2 / B4): PR front-matter sketch
 
-*Draft title + structured abstract + Impact Statement, formatted for Pediatric Research (Basic Science Article). This is **P6** in the combined programme (see `PR_ARTICLE_SLATE.md`) — the same paper the two slates called A2 (Slate A) / B4 (Slate B). It sits in Wave 3, just before the CHD paper, and is the full treatment of the method that every other paper highlights compactly. Preprint early on bioRxiv so the earlier papers can cite it. Source draft: `thesis/ai-parameterization-paper.md`. Created 2026-07-12.*
+*Draft title + structured abstract + Impact Statement, formatted for Pediatric Research (Basic Science Article). This is **P6** in the combined programme (see `PR_ARTICLE_SLATE.md`) — the same paper the two slates called A2 (Slate A) / B4 (Slate B). It sits in Wave 3, just before the CHD paper, and is the full treatment of the method that every other paper highlights compactly. Preprint early on bioRxiv so the earlier papers can cite it. Source draft: `ai-parameterization-paper.md`. Created 2026-07-12.*
 
 ---
 
