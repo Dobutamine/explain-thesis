@@ -27,7 +27,7 @@
 - **Wrong citation:** "conclusions of Bischoff et al. **[10]**" should be **[21]** ([10] = van Meurs).
 - **Typos:** "is **was** presented"; "the **norm** scenarios"; Table 4 "**patienst**". Table 4 header "Severe **PPHN** with PDA" vs sim "Severe **PH**"; caption "AAP=aortic pressure" but row labelled "ABP".
 - **No AI-parameterization Box 1** — only prose-mentioned in §4.5; must be injected (`P1_ai-param_insertions.md` is paste-ready).
-- Leftover **draft stamps** in byline ("TA, Jun 26, 2026"; "Target journal: Pediatric Research"). Source "available upon request" ×3.
+- Leftover **draft stamps** in byline ("TA, Jun 26, 2026"; "Target journal: Pediatric Research"). ~~Source "available upon request" ×3.~~ ✅ fixed 2026-07-17 → public-deposit wording (abstract, intro, §2.3).
 - Software wording is clean (JS/TS in a Web Worker — no lingering Python). No `[P#]` labels used yet.
 **Cross-refs:** respiratory model "described in a separate paper" (unlabelled = P2); acid–base already published (ref [11], Antonius 2023).
 

@@ -27,7 +27,9 @@ Two variants: a longer **Introduction** version (sets up the gap and motivates t
 
 ## Block B — compact AI-parameterization highlight (the series signature)
 
-Every paper (P1–P8) carries this. Full **box** form is the default; a **short** form is provided for space-limited papers. Both defer the full method to P6 and both point to the Methods AI-disclosure. Fill the `‹targets ← levers›` slot from the table below.
+Every paper (P1–P8) carries this. Full **box** form is the default; a **short** form is provided for space-limited papers. Both defer the full method to P6 and both point to the Methods AI-disclosure.
+
+> **P1 exception (2026-07-17):** P1's box was moved to its **Supplementary Information** (Supplemental Methods S1 in `P1_supplement_AI-parameterization.md`); its body now carries the **B-Short** pointer + the AI-use disclosure only. The in-body box remains the convention for the parameterization *showcases* **P5 and P7**. P2 and P3a previously pointed readers to "Box 1 in the cardiovascular paper [P1]" — both were redirected to cite **[P6]** for the full method. The P1 lever-fill row below is still used, now inside Supplemental Methods S1. Fill the `‹targets ← levers›` slot from the table below.
 
 ### B-Box (default — a boxed callout, ≈180 words)
 
@@ -99,4 +101,4 @@ exchange) · P7 duct- and foramen-ovale-dependent congenital heart disease.
 
 - ~~Verify reference 4 (Karger digital-twin paper)~~ — ✅ **verified 2026-07-12**: May RW et al., *Matern Child Health* 2025;1(1):26–36, doi:10.1159/000546724.
 - **Finalize ref 5 (‹P6›)** author list and its bioRxiv preprint DOI so P1–P5 can cite it as *preprint* while it is under review.
-- **Confirm "openly available … explain-modeling.com"** wording satisfies PR's Data/Code-availability policy (the engine is "available upon request" per shared Methods S5 — decide whether to also deposit code publicly).
+- ~~**Confirm "openly available … explain-modeling.com"** wording satisfies PR's Data/Code-availability policy (the engine is "available upon request" per shared Methods S5 — decide whether to also deposit code publicly).~~ — ✅ **DONE 2026-07-16/17**: deposited publicly. Engine repo public (MIT) at https://github.com/Dobutamine/explain-engine, archived under Zenodo concept DOI `10.5281/zenodo.21389097`. Shared Methods S5 and all manuscript availability statements now say **publicly available**, never "on request".

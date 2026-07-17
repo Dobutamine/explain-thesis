@@ -112,7 +112,8 @@ stay phase-locked to a single clock.
 > structural variants straightforward to inspect, share and modify. The interactive
 > application, built on the Vue framework, presents the animated model, parameter editors and
 > clinical monitors, and is freely available at https://explain-modeling.com. The engine source
-> code is extensively annotated and available upon request.
+> code is extensively annotated and publicly available at https://github.com/Dobutamine/explain-engine,
+> archived with a persistent identifier at https://doi.org/10.5281/zenodo.21389097.
 
 Structure of one step (all papers): each model's `step_model()` runs in insertion order
 (gated on `is_enabled` and initialization), executing its `calc_model()`; a data collector

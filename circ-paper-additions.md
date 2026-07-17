@@ -204,21 +204,31 @@ implementation … available upon request" sentence) with:
 > which makes patient profiles and structural variants straightforward to inspect, share
 > and modify. The interactive application, built on the Vue framework, presents the
 > animated model, parameter editors and clinical monitors, and is freely available at
-> https://explain-modeling.com. The engine source code is extensively annotated and
-> available upon request.
+> https://explain-modeling.com. The complete, annotated engine source code is publicly
+> available at https://github.com/Dobutamine/explain-engine and archived with a persistent
+> identifier at https://doi.org/10.5281/zenodo.21389097.
 
 The bulleted lists of what "developers should be able to" do can be retained; only
 replace "Python"/"notebook" phrasing to match the description above (e.g. "modify a
 model definition to create a hypotensive patient", "add a component module").
 
-**E-consistency — remove the two remaining "Python" claims elsewhere:**
+**E-consistency — remove the remaining "Python" and "on request" claims elsewhere.**
+The engine repo was made public and archived on 2026-07-16 (Zenodo concept DOI
+`10.5281/zenodo.21389097`), so *no* "available upon request" wording may survive
+anywhere in the manuscript:
 - **Abstract:** replace *"annotated Python source code is provided for researchers,
-  ensuring transparency and extensibility"* with *"annotated source code is available to
-  researchers, ensuring transparency and extensibility."*
+  ensuring transparency and extensibility"* with *"the annotated source code is publicly
+  available, ensuring transparency and extensibility."* (No URL/DOI here — the abstract is
+  already over PR's 200-word cap; §2.3 carries them.)
 - **Introduction:** replace *"The complete source code in Python is available upon
-  request."* with *"The complete source code is available upon request."*
-- The two availability statements (abstract, §4.3) and the URL https://explain-modeling.com
-  remain consistent with Block E — no other change needed.
+  request."* with *"The complete source code is publicly available (Section 2.3)."*
+- **§2.3 opening:** replace *"The source code of the Python implementation of EXPLAIN is
+  available upon request and is extensively annotated."* with *"The source code of EXPLAIN
+  is publicly available and extensively annotated."* — the full URL + DOI then appear once,
+  at the end of §2.3 (Block E block-quote above).
+- The URL https://explain-modeling.com remains consistent with Block E — no other change
+  needed. Note P1 states the archive **in the §2.3 text and carries no numbered software
+  citation** (unlike P2/P3/P4); do not add one.
 
 ---
 

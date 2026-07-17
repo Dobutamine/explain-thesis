@@ -1,4 +1,4 @@
-# An integrated model for simulation of neonatal physiology — THE cardiovascular system
+# An integrated model for simulation of neonatal physiology — The cardiovascular system
 
 Antonius TAJ, van Meurs WL, Westerhof BE, de Boode WP
 
@@ -6,8 +6,10 @@ Antonius TAJ, van Meurs WL, Westerhof BE, de Boode WP
 autoregulation [P3a]; homeostatic-regulation subsystems [P3b]; devices [P4]; integrated
 flagship [P5]; AI-parameterization [P6]; congenital heart disease [P7]). Target journal:
 Pediatric Research (Basic Science Article). Markdown working draft converted from the master
-Word manuscript `ExplainCircPaper(27012026)_WPdB_TA_WvM.docx`, with the AI-parameterization
-compact-highlight (Box 1, Fig. 6, refs [24]–[26]) folded in. Equations are transcribed to the
+Word manuscript `ExplainCircPaper(27012026)_WPdB_TA_WvM.docx`. The AI-parameterization method carries
+a compact in-body pointer (§2.3) plus the AI-use disclosure; its full highlight and figure are moved to
+Supplementary Methods S1 / Supplemental Fig. S1 (see `P1_supplement_AI-parameterization.md`; refs
+[24]–[26]). Equations are transcribed to the
 series' Unicode-blockquote convention and are to be re-keyed as native Word (OMML) objects at
 assembly; each equation block names the engine source file it is checked against. The verified
 reference list (PubMed, 2026-07-16) is carried in `P1_references_verified.md`.*
@@ -24,59 +26,38 @@ partially understood, yet diagnostic reasoning, clinical decision-making and com
 **Methods:** We describe the conceptual and mathematical underpinnings of an integrated model of neonatal physiology, focusing on the cardiovascular system. The core of the model, called
 "EXPLAIN", is a pulsatile, lumped-parameter representation of the neonatal heart and vascular
 system that accommodates multiple neonatal-specific features (e.g. foramen ovale and ductus
-arteriosus). The model is instantiated for individual patients not by hand but by an AI-assisted,
-closed-loop calibration pipeline in which a large language model interprets the available clinical
-targets and a deterministic calibrator fits the model to within clinician-meaningful tolerances;
-this pipeline generated the patient-specific configurations validated here.
+arteriosus). The patient-specific configurations validated here were produced by an automated
+calibration pipeline rather than by hand.
 
 **Results:** The model replicates both normal neonatal hemodynamics and pathological conditions
 such as a patent ductus arteriosus and acute pulmonary hypertension, using published literature as target data. Simulation results show close agreement with measured values for hemodynamic quantities including cardiac output, blood pressures and ductal Doppler flow patterns across a range of shunt magnitudes.
 
 **Conclusion:** An EXPLAIN user environment, running the model in real time, is freely available
-online (<https://explain-modeling.com/>), and annotated source code is provided for researchers,
+online (<https://explain-modeling.com/>), and the annotated source code is publicly available,
 ensuring transparency and extensibility.
-
----
 
 ## 1. Introduction
 
 Critically ill neonates exhibit complex and dynamically shifting physiology. Diagnostic reasoning
-and communication among healthcare professionals occur under time pressure, often with only partial
-information about the cardiorespiratory status. Explanatory models — visual, animated, interactive
-representations of underlying physiology, combined with interventions and clinical monitors — can
-help bridge these gaps [1]. A new explanatory model for NICU clinicians and researchers (EXPLAIN)
-should allow for the investigation of the following scenarios:
+and communication among healthcare professionals occur under time pressure, often with only partial information about the cardiorespiratory status. Explanatory models — visual, animated, interactive representations of underlying physiology, combined with interventions and clinical monitors — can help bridge these gaps [1]. A new explanatory model for NICU clinicians and researchers (EXPLAIN) should allow for the investigation of the following scenarios:
 
-- Apnea of prematurity
-- Cardiogenic shock
-- Congenital diaphragmatic hernia
-- Infant respiratory distress syndrome
-- Meconium aspiration syndrome
-- Patent ductus arteriosus (PDA)*
+- Normal fetal physiology
+- Normal term and preterm neonatal physiology
 - Acute pulmonary hypertension (aPH)*
-- Septic shock
-- Severe bradycardia and cardiac arrest
+- Patent ductus arteriosus (PDA)*
+- Congenital diaphragmatic hernia
+- Congenital heart diseases, with and without closing or restricting shunts
+- Cardiogenic and septic shock
+- Infant respiratory distress syndrome
+- Apnea of prematurity
+- Meconium aspiration syndrome
 - Tension pneumothorax
-- Hypoplastic left heart syndrome, with and without closing or restricting shunts
+- Mechanical ventilation
+- Extracorporeal life support (ECLS)
 
-"Investigation" includes exploring physiological mechanisms and pathologies, assessing the impact
-of therapeutic interventions, and facilitating case discussion and hypothesis testing. EXPLAIN
-requires an integrated mathematical model of neonatal cardiorespiratory physiology. Existing models
-do not meet these ambitious objectives [2–9]. A new integrated cardiorespiratory model is based on
-the principles outlined by van Meurs [10]. In this paper the controlled cardiovascular model for the
-term neonate is introduced. It is validated at baseline, and for the PDA and aPH conditions. The
-patient-specific configurations used in these validations were produced not by manual tuning but by
-an AI-assisted, closed-loop calibration pipeline that maps a small set of measured clinical targets
-onto the model's parameters; the pipeline is outlined in Box 1 and described in full in a companion
-paper [24]. The neonatal respiratory model, encompassing breathing, ventilation, gas exchange, gas
-transport, and metabolism, is described in a separate paper. The acid–base model was presented
-separately [11]. The model is for a full-term neonate but can be scaled to reflect prematurely born
-neonates. Degrees of prematurity do not require a change in model structure, but can be simulated by
-modifying selected model parameters and state variables. Visual interactive EXPLAIN can be run in
-real time from the web page <https://explain-modeling.com/>. The complete source code is available
-upon request.
-
----
+"Investigation" includes exploring physiological mechanisms and pathologies, assessing the impact of therapeutic interventions, and facilitating case discussion and hypothesis testing. EXPLAIN requires an integrated mathematical model of neonatal physiology. Existing models do not meet these ambitious objectives [2–9]. A new integrated model is based on
+the principles outlined by van Meurs [10]. In this paper the controlled cardiovascular model for the term neonate is introduced. It is validated at baseline, and for the PDA and aPH conditions. The patient-specific configurations used in these validations were produced not by manual tuning but by an AI-assisted, closed-loop calibration pipeline that maps a small set of measured clinical targets onto the model's parameters; the pipeline is summarized in Supplementary Methods S1 and described in full in a companion paper [24]. The neonatal respiratory model, encompassing breathing, ventilation, gas exchange, gas transport, and metabolism, is described in a separate paper. The acid–base model was presented separately [11]. The model is for a full-term neonate but can be scaled to reflect prematurely born neonates. Degrees of prematurity do not require a change in model structure, but can be simulated by modifying selected model parameters and state variables through the AI-assisted calibration pipeline. Visual interactive EXPLAIN can be run in
+real time from the web page <https://explain-modeling.com/>. The complete source code is publicly available (Section 2.3).
 
 ## 2. Methods
 
@@ -90,113 +71,34 @@ represented in this figure.
 cardiorespiratory model, adapted from van Meurs [10].
 
 The two bottom blocks of Figure 1 reflect blood flow and control of circulation, and the two top
-blocks reflect gas flow and control of breathing. Oxygen delivery, cellular metabolism, and carbon
-dioxide elimination, part of the central block, rely on both gas flow and blood flow. Control
-effectors are described in detail below. This article describes the model of the neonatal
-cardiovascular system: the two bottom blocks in Figure 1, a software implementation of this model,
-and selected cardiovascular simulation results and model validation.
+blocks reflect gas flow and control of breathing. Oxygen delivery, cellular metabolism, and carbon dioxide elimination, part of the central block, rely on both gas flow and blood flow. Control effectors are described in detail below. This article describes the model of the neonatal
+cardiovascular system: the two bottom blocks in Figure 1, a software implementation of this model, and selected cardiovascular simulation results and model validation.
 
-A cardiac-rhythm sub-model is part of the circulation model. It responds to the circulatory control
-effector heart rate from the control-of-circulation model and generates heart-chamber activation
-functions. These are sent to the hemodynamics model described below. The underlying time-varying
-elastance model and the four heart-chamber activation functions are explained in the mathematical
-model section. The function of the SA and AV nodes is implicit in the modeled time functions. The
-variable heart rate determines the firing rate of the SA node. Dysrhythmias can be simulated by
-ad-hoc changes to the parameters of the cardiac-rhythm model.
+A cardiac-rhythm sub-model is part of the circulation model. It responds to the circulatory control effector heart rate from the control-of-circulation model and generates heart-chamber activation functions. These are sent to the hemodynamics model described below. The underlying time-varying elastance model and the atrial and ventricular heart-chamber activation functions are explained in the mathematical model section. The function of the SA and AV nodes is implicit in the modeled time functions. The variable heart rate determines the firing rate of the SA node. Dysrhythmias can be simulated by ad-hoc changes to the parameters of the cardiac-rhythm model.
 
-The other sub-model of the circulation model is the hemodynamics model, which reflects cardiac and
-vascular blood volumes, pressures, and flow rates. It responds to activation functions from the
-cardiac-rhythm model, intrathoracic pressure generated by the ventilation model, and circulatory
-control effectors, including contractility, arteriolar resistance and elastance, and venous
-unstressed volume. Arterial blood pressure is an output variable from the hemodynamics model to the
-control-of-circulation model, and various circulatory volumes and flow rates are outputs to the
-transport-and-metabolism model. Figure 2 gives a hydraulic-circuit representation of the neonatal
-hemodynamics model. The basis for this model is the one given by Beneken [12] (see also Goodwin et
-al. [13]), expanded by the specific tissue groups and neonatal shunts that are needed to simulate
-the neonatal conditions mentioned in the introduction.
+The other sub-model of the circulation model is the hemodynamics model, which reflects cardiac and vascular blood volumes, pressures, and flow rates. It responds to activation functions from the cardiac-rhythm model, intrathoracic pressure generated by the ventilation model, and circulatory control effectors, including contractility, arteriolar resistance and elastance, and venous unstressed volume. Arterial blood pressure is an output variable from the hemodynamics model to the control-of-circulation model, and various circulatory volumes and flow rates are outputs to the transport-and-metabolism model. Figure 2 gives a hydraulic-circuit representation of the neonatal hemodynamics model. The basis for this model is the one given by Beneken [12] (see also Goodwin etal. [13]), expanded by the specific tissue groups and neonatal shunts that are needed to simulate the neonatal conditions mentioned in the introduction.
 
 **Fig. 2** (`Fig2_cardiovascular_hydraulic_circuit.svg`). Hydraulic-circuit representation
-of neonatal hemodynamics. See Table 1 for the symbols used and their mathematical description.
-Intra-thoracic components are indicated in blue and extra-thoracic components in black. Components
-located inside the pericardium have a light-grey background. Dashed lines represent shunts that are
-exclusive to the neonate, or more significant than in a typical adult. **Time-varying elastances:**
-LA left atrium, LV left ventricle, RA right atrium, RV right ventricle, COR coronaries.
-**Capacitances:** AA ascending aorta, AAR aortic arch and intrathoracic descending aorta, AD
-extrathoracic descending aorta, BR brain, RUB remainder of the upper body, VUB veins of the upper
-body, SVC superior vena cava, LS liver and spleen, INT intestines, KID kidneys, RLB remainder of
-the lower body, VLB veins of the lower body, IVCI intrathoracic inferior vena cava, PA pulmonary
-artery, LL left lung, RL right lung, PV pulmonary veins. All organ capacitances have an associated
-arteriole (A) and venule (V) connected to the capacitance by a resistor (not represented).
-**Shunts:** DA ductus arteriosus, FO foramen ovale, IPS intrapulmonary shunt, VSD ventricular
-septal defect.
+of neonatal hemodynamics. See Table 1 for the symbols used and their mathematical description. Intra-thoracic components are indicated in blue and extra-thoracic components in black. Components located inside the pericardium have a light-grey background. Dashed lines represent shunts that are exclusive to the neonate, or more significant than in a typical adult. **Time-varying elastances:** LA left atrium, LV left ventricle, RA right atrium, RV right ventricle, COR coronaries. For clarity the right atrium is drawn as a single compartment; it is implemented as the two chambers RASVC and RAIVCI described in Section 2.1. **Capacitances:** AA ascending aorta, AAR aortic arch and intrathoracic descending aorta, AD extra-thoracic descending aorta, BR brain, RUB remainder of the upper body, VUB veins of the upper body, SVC superior vena cava, LS liver and spleen, INT intestines, KID kidneys, RLB remainder of the lower body, VLB veins of the lower body, IVCI intrathoracic inferior vena cava, PA pulmonary artery, PAL and PAR left and right pulmonary artery branches, LL left lung, RL right lung, PV pulmonary veins. All organ capacitances have an associated arteriole (A) and venule (V) connected to the capacitance by a resistor (not represented). **Shunts:** DA ductus arteriosus, FO foramen ovale, IPS intrapulmonary shunt, VSD ventricular septal defect.
 
 The heart-chamber activation functions, normalized to an amplitude of 1 (dimensionless), are
-multiplied by contractility from the control-of-circulation model and then drive the heart chambers.
-In the hemodynamics model, capacitances, indicated by circles, contain time-varying blood volumes.
-The transport-and-metabolism model described in a separate paper has compartments with time-varying
-blood-gas contents. The cardiac chambers — left atrium (LA), left ventricle (LV), right atrium (RA)
-and right ventricle (RV) — were already part of the Beneken model [12], as were the pulmonary artery
-(PA) and pulmonary veins (PV). The intrathoracic systemic arterial compartment of the Beneken model
-is divided into ascending aorta (AA) and aortic arch with intrathoracic descending aorta (AAR), so
-that blood with shunt-dependent, different oxygen contents can flow to the coronaries, and to the
-brain and lower body. This is required to enable the representation of the many neonatal conditions
-in which the shunt across the ductus arteriosus is important. A separate coronary (COR) circulation
-is included to realistically simulate oxygen delivery to the myocardium. The ventricular activation
-function is also applied to the elastance of the coronary capacitance, which reproduces the
-characteristic coronary flow pattern dominated by diastolic blood flow. The central chemoreceptors
-require the simulation of a separate brain (BR) capacitance. Cerebral autoregulation is not included
-in the cardiovascular model presented here (it is developed in a companion paper [P3a]); to enable
-that, a separate remainder-of-the-upper-body (RUB) compartment, which is not subject to
-autoregulation, is already included. The veins of the upper body (VUB) and superior vena cava (SVC)
-act as the downstream compartment to the upper-body circulation, where the SVC is located inside the
-thoracic compartment. The intestines (INT) play an important role in redistribution of blood flow.
+multiplied by contractility from the control-of-circulation model and then drive the heart chambers. In the hemodynamics model, capacitances, indicated by circles, contain time-varying blood volumes. The transport-and-metabolism model described in a separate paper has compartments with time-varying blood-gas contents. The cardiac chambers — left atrium (LA), left ventricle (LV), right atrium and right ventricle (RV) — were already part of the Beneken model [12], as were the pulmonary artery (PA) and pulmonary veins (PV). The right atrium of the Beneken model is divided into two chambers, one receiving the superior vena cava (RASVC) and one receiving the intrathoracic inferior vena cava (RAIVCI), so that the two caval streams with their different oxygen contents remain separate within the atrium. Each chamber has its own tricuspid inflow to the right ventricle and its own path across the foramen ovale to the left atrium; both are driven by the same atrial activation function and therefore contract in synchrony, and their elastances are scaled such that the two halves together are equivalent to a single atrium. This division reproduces the preferential streaming of caval return that characterizes the fetal circulation, in which well-oxygenated blood from the inferior vena cava and ductus venosus crosses the foramen ovale to the left atrium, while superior caval return is directed preferentially to the right ventricle. A resistor representing an intra-atrial shunt connects the two chambers and allows the streams to be mixed, but it is closed in the models presented here. For clarity, Figure 2 represents both chambers as a single right atrium. The intrathoracic systemic arterial compartment of the Beneken model is divided into ascending aorta (AA) and aortic arch with intrathoracic descending aorta (AAR), so that blood with shunt-dependent, different oxygen contents can flow to the coronaries, and to the brain and lower body. This is required to enable the representation of the many neonatal conditions
+in which the shunt across the ductus arteriosus is important. A separate coronary (COR) circulation is included to realistically simulate oxygen delivery to the myocardium. The ventricular activation function is also applied to the elastance of the coronary capacitance, which reproduces the characteristic coronary flow pattern dominated by diastolic blood flow. The central chemoreceptors require the simulation of a separate brain (BR) capacitance. Cerebral autoregulation is not included in the cardiovascular model presented here (it is developed in a companion paper [P3a]); to enable that, a separate remainder-of-the-upper-body (RUB) compartment, which is not subject to autoregulation, is already included. The veins of the upper body (VUB) and superior vena cava (SVC) act as the downstream compartment to the upper-body circulation, where the SVC is located inside the thoracic compartment and drains into RASVC. The intestines (INT) play an important role in redistribution of blood flow.
 Albeit not strictly required for the cardiorespiratory model, liver-and-spleen (LS) and kidneys
-(KID) compartments are necessary for differential metabolism in pharmacokinetic models. Other organs
-in the lower body are lumped together in the remainder-of-lower-body (RLB) compartment. Each organ
-consists of three capacitances connected by resistors representing the arteriole (A), capillary bed
-and venule (V) of that organ system. This configuration allows for an improved representation of the
-hemodynamic response to autonomic control. Separate left and right lung circulations and
-compartments are required for the simulation of unilateral phenomena in tension pneumothorax and
-congenital diaphragmatic hernia (CDH). The intrapulmonary shunt (IPS) is included to allow for
-simulation of heterogeneous pulmonary perfusion states and atelectasis. The foramen ovale (FO) and
-ductus arteriosus (DA) are necessary for the representation of, for example, a persistent patent
-ductus arteriosus, hypoplastic left heart syndrome, and congenital diaphragmatic hernia. The
-distinction between intra- and extra-thoracic venous compartments (IVCI and VLB) allows for
-simulation of the effects of intrathoracic pressure on the circulation. Intrathoracic pressure is
-modulated by spontaneous breathing, mechanical ventilation, and chest compressions. The pericardium,
-not shown in Figure 2, is modelled as an elastic structure with a low compliance above its
-unstressed volume, limiting the sum of the heart-chamber volumes.
+(KID) compartments are necessary for differential metabolism in pharmacokinetic models. Other organs in the lower body are lumped together in the remainder-of-lower-body (RLB) compartment. Each organ consists of three capacitances connected by resistors representing the arteriole (A), capillary bed and venule (V) of that organ system. This configuration allows for an improved representation of the hemodynamic response to autonomic control. Separate left and right lung circulations and compartments are required for the simulation of unilateral phenomena in tension pneumothorax and congenital diaphragmatic hernia (CDH). The intrapulmonary shunt (IPS) is included to allow for simulation of heterogeneous pulmonary perfusion states and atelectasis. The foramen ovale (FO) and ductus arteriosus (DA) are necessary for the representation of, for example, a persistent patent ductus arteriosus, hypoplastic left heart syndrome, and congenital diaphragmatic hernia. The distinction between intra- and extra-thoracic venous compartments (IVCI and VLB) allows for simulation of the effects of intrathoracic pressure on the circulation; the IVCI drains into RAIVCI. Intrathoracic pressure is modulated by spontaneous breathing, mechanical ventilation, and chest compressions. The pericardium, not shown in Figure 2, is modelled as an elastic structure with a low compliance above its unstressed volume, limiting the sum of the heart-chamber volumes.
 
-The control of circulation by the autonomic nervous system (ANS) is based on the model described by
-van Meurs [10]. In this model, the main regulated cardiovascular variable, arterial pressure, is
-represented by an afferent activation function (Fig. 4). This function has a defined setpoint around
-which it operates and minimum and maximum activation levels. The model is expanded as follows: the
-afferent signal is used to determine the sympatho-vagal balance (SVB). A mean arterial pressure
-below the setpoint produces a positive SVB, corresponding to sympathetic dominance and
-cardiovascular stimulation. Pressure above the setpoint results in a negative SVB, indicating
-parasympathetic (vagal) dominance and cardiovascular depression. The magnitude of this response is
-defined by a baroreflex gain that determines the sensitivity of SVB to changes in arterial pressure.
-The resulting SVB controls the efferent cardiovascular effectors, including heart rate, myocardial
-contractility, systemic vascular resistance, and venous tone. Each effector responds to SVB
-according to its specific gain and is constrained to physiological limits. The model represents a
-closed-loop baroreflex system in which arterial blood pressure is sensed, transformed into a unified
-autonomic control signal (SVB), and used to adjust cardiovascular function to restore and maintain
-pressure homeostasis. A further expansion of the van Meurs model is the inclusion of a time constant
-that determines how quickly it responds to changes in the controlled variable. The SVB-based model
-can easily be expanded to include additional cardiorespiratory receptors.
+The control of circulation by the autonomic nervous system (ANS) is based on the model described by van Meurs [10]. In this model, the main regulated cardiovascular variable, arterial pressure, is represented by an afferent activation function (Fig. 4). This function has a defined setpoint around which it operates and minimum and maximum activation levels. The model is expanded as follows: the afferent signal is used to determine the sympatho-vagal balance (SVB). A mean arterial pressure below the setpoint produces a positive SVB, corresponding to sympathetic dominance and cardiovascular stimulation. Pressure above the setpoint results in a negative SVB, indicating parasympathetic (vagal) dominance and cardiovascular depression. The magnitude of this response is defined by a baroreflex gain that determines the sensitivity of SVB to changes in arterial pressure. The resulting SVB controls the efferent cardiovascular effectors, including heart rate, myocardial contractility, systemic vascular resistance, and venous tone. Each effector responds to SVB according to its specific gain and is constrained to physiological limits. The model represents a closed-loop baroreflex system in which arterial blood pressure is sensed, transformed into a unified autonomic control signal (SVB), and used to adjust cardiovascular function to restore and maintain pressure homeostasis. A further expansion of the van Meurs model is the inclusion of a time constant that determines how quickly it responds to changes in the controlled variable. The SVB-based model can easily be expanded to include additional cardiorespiratory receptors.
 
 ### 2.2 Mathematical model
 
 Cardiac cycle time is denoted by *n* = 1, 2, 3, … (dimensionless). Continuous time is denoted by *t*
-(s). The heart model is based on the time-varying elastance model first described by Beneken [12],
-and validated in dogs by Suga et al. [14]. Figure 3 shows the elastances for the neonatal left
+(s). The heart model is based on the time-varying elastance model first described by Beneken [12], and validated in dogs by Suga et al. [14]. Figure 3 shows the elastances for the neonatal left
 heart.
 
 *Source: `explain/component_models/Heart.js`.*
 
 Contractions are simulated via rising heart-chamber elastances, resulting in physiologic pressure
-and flow patterns in the hemodynamics model. The atria are activated by a half-sinusoid over the
-duration of atrial systole in seconds (*T*_as). This duration is defined by the PQ time in seconds:
+and flow patterns in the hemodynamics model. The atria are activated by a half-sinusoid over the duration of atrial systole in seconds (*T*_as). This duration is defined by the PQ time in seconds:
 
 > **Eq. 1** &nbsp; *a*_a(*t*) = sin[π·(*t* / *T*_as)]
 
@@ -219,8 +121,7 @@ Eq. 2 — each with its chamber-specific baseline elastance E_min and peak-systo
 e_max(n).)*
 
 **Fluid-circuit elements.** The hydraulic circuit of Figure 2 is built from five element types —
-resistor, valve, capacitance, container and time-varying elastance — each governed by a piece-wise
-continuous constitutive law relating volume *v*(*t*), pressure *p*(*t*) and flow rate *f*(*t*)
+resistor, valve, capacitance, container and time-varying elastance — each governed by a piece-wise continuous constitutive law relating volume *v*(*t*), pressure *p*(*t*) and flow rate *f*(*t*)
 (Table 1).
 
 *Source: `explain/base_models/Resistor.js`, `explain/base_models/Capacitance.js`,
@@ -245,16 +146,14 @@ volume UV, and a non-linear coefficient *K*₂:
 > **Eq. 6** &nbsp; *v*(*t*) ≥ UV: &nbsp; *p*₁(*t*) = *K*₂·[*v*(*t*) − UV]² + *E*·[*v*(*t*) − UV] + *p*₂(*t*)
 > **Eq. 6** &nbsp; *v*(*t*) < UV: &nbsp; *p*₁(*t*) = −*K*₂·[*v*(*t*) − UV]² + *E*·[*v*(*t*) − UV] + *p*₂(*t*)
 
-A **container** is a capacitance whose volume is the sum of the volumes of the enclosed compartments,
-transmitting its recoil pressure back onto them:
+A **container** is a capacitance whose volume is the sum of the volumes of the enclosed compartments, transmitting its recoil pressure back onto them:
 
 > **Eq. 7** &nbsp; *v*(*t*) = Σ *v*_n(*t*)
 > **Eq. 7** &nbsp; *v*(*t*) ≥ UV: &nbsp; *p*₁(*t*) = *K*₂·[*v*(*t*) − UV]² + *E*·[*v*(*t*) − UV] + *p*₂(*t*)
 > **Eq. 7** &nbsp; *v*(*t*) < UV: &nbsp; *p*₁(*t*) = −*K*₂·[*v*(*t*) − UV]² + *E*·[*v*(*t*) − UV] + *p*₂(*t*)
 
 A **time-varying elastance** interpolates, via the chamber activation function *a*(*t*), between an
-end-diastolic pressure *p*_ed (a capacitance with minimum elastance E_min) and a maximum-systolic
-pressure *p*_ms (a linear elastance e_max(*n*)):
+end-diastolic pressure *p*_ed (a capacitance with minimum elastance E_min) and a maximum-systolic pressure *p*_ms (a linear elastance e_max(*n*)):
 
 > **Eq. 8** &nbsp; *v*(*t*) ≥ UV: &nbsp; *p*_ed(*t*) = *K*₂·[*v*(*t*) − UV]² + *E*_min·[*v*(*t*) − UV]
 > **Eq. 8** &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *p*_ms(*t*) = *e*_max(*n*)·[*v*(*t*) − UV]
@@ -274,25 +173,10 @@ mmHg·s·L⁻¹, *K*₁ in mmHg·L²·s⁻², *K*₂ in mmHg·L⁻².
 | Container | Eq. 7 | *E*, UV, *K*₂; volume = Σ enclosed-compartment volumes |
 | Time-varying elastance | Eq. 8 | E_min, e_max(*n*), UV, *K*₂; activation *a*(*t*) |
 
-Resistance can be different for forward (*R*_f) and reverse (*R*_r) flow. The constant *K*₁ (Table 1)
-governs non-linear behavior: for *K*₁ > 0 the flow rate for higher pressure differences is reduced
-compared with the linear case. *K*₁ is assumed to be identical for forward and reverse flow rates.
-Capacitance characteristics are represented by a piece-wise continuous relationship between volume
-*v*(*t*) and transmural pressure *p*₁(*t*) − *p*₂(*t*), governed by the elastance *E* (inverse
-compliance), the unstressed volume UV, and the non-linearity parameter *K*₂. A correctly functioning
-valve is a resistor with infinite reverse-flow resistance. Strictly speaking, for mathematical
-reasons this element could be replaced by a resistance, but it was chosen not to do so, to enable
-future work on heart-valve pathologies. Time-varying elastances during diastole resemble a
-capacitance with a minimum elastance *E* = E_min. For the atria and coronary circulation *K*₂ = 0,
-assuming linear behavior over the range of volumes of interest. For the ventricles *K*₂ is non-zero,
-so that the diastolic ventricular elastances saturate for higher volumes. For maximum contraction, a
-linear characteristic is applied. The maximum elastance e_max(*n*) of the left ventricle is an input
-variable to the hemodynamics model from the control-of-circulation model. It affects all four heart
-chambers, as well as the coronary circulation, with a fixed proportionality factor per chamber. The
-transition between end diastole (ed) and maximum systole (ms) of the ventricles is governed by
-Equation 8, which takes the ventricular activation function *a*(*t*) as an input [16]. Using the
-equations in Table 1, pressures in all capacitances of Figure 2 are computed from the volumes at
-time *t* and the relevant parameters.
+Resistance can be different for forward (R_f) and reverse (*R_r) flow. The constant *K*₁ (Table 1)*
+*governs non-linear behavior: for *K*₁ > 0 the flow rate for higher pressure differences is reduced*
+*compared with the linear case. *K*₁ is assumed to be identical for forward and reverse flow rates.*
+*Capacitance characteristics are represented by a piece-wise continuous relationship between volume *v*(*t*) and transmural pressure *p*₁(*t*) − *p*₂(*t*), governed by the elastance *E* (inverse compliance), the unstressed volume UV, and the non-linearity parameter *K*₂. A correctly functioning valve is a resistor with infinite reverse-flow resistance. Strictly speaking, for mathematical reasons this element could be replaced by a resistance, but it was chosen not to do so, to enable future work on heart-valve pathologies. Time-varying elastances during diastole resemble a capacitance with a minimum elastance *E* = E_min. For the atria and coronary circulation *K*₂ = 0, assuming linear behavior over the range of volumes of interest. For the ventricles *K*₂ is non-zero, so that the diastolic ventricular elastances saturate for higher volumes. For maximum contraction, a linear characteristic is applied. The maximum elastance e_max(*n*) of the left ventricle is an input variable to the hemodynamics model from the control-of-circulation model. It affects all heart chambers, as well as the coronary circulation, with a fixed proportionality factor per chamber. The transition between end diastole (ed) and maximum systole (ms) of the ventricles is governed by Equation 8, which takes the ventricular activation function *a*(*t*) as an input [16]. Using the equations in Table 1, pressures in all capacitances of Figure 2 are computed from the volumes at time *t* and the relevant parameters.*
 
 The control of circulation is expressed as a set of coupled mathematical functions describing the
 afferent activation, the sympatho-vagal balance (SVB), and the efferent control effects.
@@ -307,9 +191,7 @@ centered around the setpoint of the controlled variable *cv*, where af_cv = 0 at
 > **Eq. 9** &nbsp; *cv* ≤ CV_min: &nbsp; af = CV_min − CV_sp
 
 where af is the receptor activation, CV_sp the setpoint of the controlled variable, and CV_max /
-CV_min its maximum and minimum values. To represent the finite adaptation time of the receptor, the
-activation is low-pass-filtered using a discrete-time first-order filter with receptor time constant
-τ_cv, resulting in a filtered activation *a*.
+CV_min its maximum and minimum values. To represent the finite adaptation time of the receptor, the activation is low-pass-filtered using a discrete-time first-order filter with receptor time constant τ_cv, resulting in a filtered activation *a*.
 
 **Fig. 4** (`Fig4_cardiovascular_activation_function.svg`). Activation function, adapted from
 van Meurs [10]. The receptor activation af is zero at the setpoint CV_sp and saturates at its
@@ -331,15 +213,7 @@ value.
 
 ### 2.3 Software implementation and code verification
 
-The main target audience of EXPLAIN consists of clinical researchers in neonatal intensive care. The
-user can explore effects of therapeutic interventions and different clinical conditions, including
-the validation experiments of this paper. The free software is accessible using standard browsers
-via <https://explain-modeling.com/>. An important additional objective of the present work is to
-enable model developers to understand, use, and modify the model and corresponding code. The source
-code of EXPLAIN is available upon request and is extensively annotated. Developers with
-undergraduate-level software-engineering experience, and basic knowledge of the JavaScript/
-TypeScript programming language, should — after a few days of familiarization with the environment —
-be able to:
+The main target audience of EXPLAIN consists of clinical researchers in neonatal intensive care. The user can explore effects of therapeutic interventions and different clinical conditions, including the validation experiments of this paper. The free software is accessible using standard browsers via <https://explain-modeling.com/>. An important additional objective of the present work is to enable model developers to understand, use, and modify the model and corresponding code. The source code of EXPLAIN is publicly available and extensively annotated. Developers with undergraduate-level software-engineering experience, and basic knowledge of the JavaScript/ TypeScript programming language, should — after a few days of familiarization with the environment — be able to:
 
 - run the described integrated model, and plot graphs of variables of interest, for example right
   ventricular pressures and volumes;
@@ -355,46 +229,14 @@ With a little more time, developers should be able to:
 - optimize numerical-integration methods and simulation run-time;
 - use the models in other applications, for example in clinical decision support.
 
-The model developer environment is implemented as a framework-agnostic simulation engine written in
-JavaScript/TypeScript that runs inside a Web Worker — a background execution thread separate from the
-user interface — communicating with the application through a simple message-passing protocol, so
-that the physics loop advances independently of rendering and user interaction and the model runs in
-real time in a standard web browser. Each physiological component is a small, self-contained module
-that implements the equations of Section 2.2; complete scenarios (baseline anatomy, parameters and
-initial state) are defined declaratively as JSON model definitions, which makes patient profiles and
-structural variants straightforward to inspect, share and modify. The code that combines and
-sequences the different model software components is visible and non-proprietary but will typically
-not be modified by the developer. A tutorial for model development is included, and the code contains
-explicit comments. The complete, annotated engine source code is publicly available at
+The model developer environment is implemented as a framework-agnostic simulation engine written in JavaScript/TypeScript that runs inside a Web Worker — a background execution thread separate from the user interface — communicating with the application through a simple message-passing protocol, so that the physics loop advances independently of rendering and user interaction and the model runs in real time in a standard web browser. Each physiological component is a small, self-contained module that implements the equations of Section 2.2; complete scenarios (baseline anatomy, parameters and initial state) are defined declaratively as JSON model definitions, which makes patient profiles and structural variants straightforward to inspect, share and modify. The code that combines and sequences the different model software components is visible and non-proprietary but will typically not be modified by the developer. A tutorial for model development is included, and the code contains explicit comments. The complete, annotated engine source code is publicly available at
 <https://github.com/Dobutamine/explain-engine> and archived with a persistent identifier at
 <https://doi.org/10.5281/zenodo.21389097>.
 
-> **Box 1 · How the virtual patients in this paper were parameterized.**
-> The patient profiles used here were not tuned by hand. EXPLAIN instantiates a patient with a
-> two-layer, AI-assisted pipeline (illustrated in Fig. 6). An *interpretation layer* — a large
-> language model — reads the available clinical description (free text, monitor values or a report)
-> and emits a validated, bounded specification: a baseline, target values and named pathophysiology,
-> expressed only through the same allowlisted, schema-checked commands as the interactive parameter
-> editor. A *calibration layer* — a deterministic root-finder — then fits the model by assigning one
-> physiologically interpretable lever to each target and driving that target to a clinician-
-> meaningful tolerance, after allometric and gestational-age seeding and baroreflex set-point
-> alignment so that the model's own control loops defend rather than oppose the fit. The language
-> model performs no numerical fitting and never edits equations or state. For the cardiovascular
-> targets of this paper the pairings are: mean arterial pressure ← systemic (arteriolar) resistance;
-> cardiac output ← ventricular contractility (e_max); heart rate ← heart-rate reference; central
-> venous pressure ← systemic venous unstressed volume; mean pulmonary artery pressure ← pulmonary
-> vascular resistance. The full method — convergence behaviour, the sensitivity-analysis
-> justification for the one-lever-per-target design, and the offline-construction and live-tuning
-> entry points — is given in the companion paper [24]; the use of a language model as a *method
-> component*, not an author, is disclosed below.
+The virtual patients used in this paper were not tuned by hand. A large language model interprets the available clinical targets into a validated, allowlisted specification, and a deterministic calibrator then fits the model by driving one physiologically interpretable lever per target to a clinician-meaningful tolerance, after allometric and gestational-age seeding and baroreflex set-point alignment; the language model performs no numerical fitting and never edits equations or state. The per-target lever assignments for the cardiovascular model, the convergence behaviour, and the sensitivity-analysis justification for the one-lever-per-target design are given in Supplementary Methods S1 and, in full, in the companion paper [24].
 
 **AI-use disclosure.** A large language model (Claude, Anthropic [25]), orchestrated through the
-Claude Agent SDK [26], is used as a component of the parameterization method: it interprets clinical
-inputs and emits validated, allowlisted specifications. It performs no numerical fitting, does not
-modify the model's equations or state, and is not used to generate the scientific content or text of
-this study; no authorship is attributed to it.
-
----
+Claude Agent SDK [26], is used as a component of the parameterization method: it interprets clinical inputs and emits validated, allowlisted specifications. It performs no numerical fitting, does not modify the model's equations or state, and is not used to generate the scientific content or text of this study; no authorship is attributed to it.
 
 ## 3. Results
 
@@ -402,19 +244,13 @@ this study; no authorship is attributed to it.
 
 #### 3.1.1 Baseline hemodynamics
 
-To validate the hemodynamic baseline state of the model we used published hemodynamic data of Jhaveri
-et al. [17], Groves et al. [18], Kluckow and Evans [19], and van Zadelhoff et al. [20]. These papers
-provide relevant hemodynamic data for normal full-term neonates and are in acceptable agreement with
-each other. Table 2 lists the reported hemodynamic data and the simulated results. Reported
-simulation results are end-expiratory, at an intrathoracic pressure of −3.5 mmHg.
+To validate the hemodynamic baseline state of the model we used published hemodynamic data of Jhaveri et al. [17], Groves et al. [18], Kluckow and Evans [19], and van Zadelhoff et al. [20]. These papers provide relevant hemodynamic data for normal full-term neonates and are in acceptable agreement with each other. Table 2 lists the reported hemodynamic data and the simulated results. Reported simulation results are end-expiratory, at an intrathoracic pressure of −3.5 mmHg.
 
 **Table 2. Baseline hemodynamics — target data and simulation results** for a normal term-born
 neonate of 3.3 kg at an age of 24 h. Columns Jhaveri–van Zadelhoff are target data from the
 literature; EXPLAIN is the simulation result. HR heart rate, LVEDV/LVESV left-ventricular end-
 diastolic/end-systolic volume, LVSV left-ventricular stroke volume, LVO left-ventricular output,
-RVEDV/RVESV/RVSV/RVO the right-ventricular analogues, fSVC superior vena cava flow, ABPs/ABPd
-systolic/diastolic arterial blood pressure. Volumes in mL, flow rates in mL·min⁻¹·kg⁻¹, pressures in
-mmHg. "–" = not reported.
+RVEDV/RVESV/RVSV/RVO the right-ventricular analogues, fSVC superior vena cava flow, ABPs/ABPd systolic/diastolic arterial blood pressure. Volumes in mL, flow rates in mL·min⁻¹·kg⁻¹, pressures in mmHg. "–" = not reported.
 
 | Quantity | Jhaveri [17] | Groves [18] | Kluckow [19] | van Zadelhoff [20] | EXPLAIN |
 |---|---|---|---|---|---|
@@ -431,38 +267,21 @@ mmHg. "–" = not reported.
 | ABPs | – | – | – | 67 | 70 |
 | ABPd | – | – | – | 42 | 45 |
 
-There is a close match of the simulation results to target data coming from different sources, which
-measured the parameters using different techniques (echocardiography and MRI). Normal values of the
-resulting blood pressure are reported by many articles; we used a recent study [20] to validate our
-data, as it reports blood pressure over a range of gestational and postnatal ages.
+There is a close match of the simulation results to target data coming from different sources, which measured the parameters using different techniques (echocardiography and MRI). Normal values of the resulting blood pressure are reported by many articles; we used a recent study [20] to validate our data, as it reports blood pressure over a range of gestational and postnatal ages.
 
 #### 3.1.2 Persistent ductus arteriosus (PDA)
 
 One of the target clinical scenarios is a persistent patent ductus arteriosus (PDA). Bischoff et al.
-[21] provide detailed neonatal hemodynamic data, making PDA a suitable validation case. Table 3
-summarizes the effects of absent, bidirectional, and significant left-to-right shunting on left
+[21] provide detailed neonatal hemodynamic data, making PDA a suitable validation case. Table 3 summarizes the effects of absent, bidirectional, and significant left-to-right shunting on left
 ventricular output (LVO), right ventricular output (RVO), superior vena cava flow (SVCF), and the
-LVO/RVO ratio. The baseline premature-infant configuration reported by Bischoff et al. was produced
-with the AI-assisted calibration pipeline (Box 1): blood volumes, unstressed volumes, elastances and
-resistances were first scaled allometrically to the reported weight, after which the calibrator
-fitted the model to the reported baseline hemodynamic targets. A bidirectional shunt (≥10% right-to-
-left time) was obtained by modifying pulmonary vascular resistance and elastance at a ductus diameter
-of 2.2 mm. A hemodynamically significant left-to-right shunt (100% left-to-right) was created by
-lowering pulmonary vascular resistance to achieve an LVO/RVO ratio of 1.55. Simulations used active
-circulatory control, a small foramen ovale, and end-expiratory conditions at −3.5 mmHg intrathoracic
-pressure. For a more qualitative validation of model waveform output, Doppler flow-velocity target
-data for non-restrictive and restrictive left-to-right transductal blood flow, and for bidirectional
-transductal blood flow, were obtained from van Laere et al. [22]. The simulated instantaneous PDA
-flow rate *f*_DA(*t*) in L·s⁻¹ (Fig. 2) is transformed into a Doppler flow pattern with a velocity
-*v*_DA(*t*) in m·s⁻¹, averaged over the ductus velocity profile:
+LVO/RVO ratio. The baseline premature-infant configuration reported by Bischoff et al. was produced with the AI-assisted calibration pipeline (Supplementary Methods S1): blood volumes, unstressed volumes, elastances and resistances were first scaled allometrically to the reported weight, after which the calibrator fitted the model to the reported baseline hemodynamic targets. A bidirectional shunt (≥10% right-to- left time) was obtained by modifying pulmonary vascular resistance and elastance at a ductus diameter of 2.2 mm. A hemodynamically significant left-to-right shunt (100% left-to-right) was created by lowering pulmonary vascular resistance to achieve an LVO/RVO ratio of 1.55. Simulations used active circulatory control, a small foramen ovale, and end-expiratory conditions at −3.5 mmHg intrathoracic pressure. For a more qualitative validation of model waveform output, Doppler flow-velocity target data for non-restrictive and restrictive left-to-right transductal blood flow, and for bidirectional transductal blood flow, were obtained from van Laere et al. [22]. The simulated instantaneous PDA flow rate *f*_DA(*t*) in L·s⁻¹ (Fig. 2) is transformed into a Doppler flow pattern with a velocity *v*_DA(*t*) in m·s⁻¹, averaged over the ductus velocity profile:
 
 > **Eq. 12** &nbsp; *v*_DA(*t*) = 1000·*f*_DA(*t*) / (π·(*D*_PDA / 2)²)
 
 *Source: `explain/component_models/Pda.js`.*
 
 **Table 3. PDA — target data from Bischoff et al. [21] and simulation results** for a patient with
-three levels of PDA. Flow rates in mL·min⁻¹·kg⁻¹. The lower block reports each quantity as a fraction
-(*f*) of the "no PDA" baseline value. Abbreviations as in Table 2.
+three levels of PDA. Flow rates in mL·min⁻¹·kg⁻¹. The lower block reports each quantity as a fraction (*f*) of the "no PDA" baseline value. Abbreviations as in Table 2.
 
 | Quantity | Target: no PDA | Target: bidirectional | Target: PDA | Sim: no PDA | Sim: bidirectional | Sim: PDA |
 |---|---|---|---|---|---|---|
@@ -481,18 +300,11 @@ The simulation results confirm the main conclusions of Bischoff et al. [21], nam
 - left ventricular output is higher with a transductal left-to-right shunt;
 - the ratio of left-to-right ventricular output is higher with a transductal left-to-right shunt.
 
-Simulated relative hemodynamic changes between the absence and presence of transductal left-to-right
-shunt flow closely match the target data. Changes for the bidirectional-shunt condition reproduce the
-correct direction and order of magnitude, though not the exact values. Notably, the model replicates
-the paradoxical reduction in LVO seen with bidirectional shunting, allowing further exploration of
-this finding. The model also generates Doppler and instantaneous flow patterns during ductal closure;
-Figure 5 compares simulation outputs with published transductal Doppler data.
+Simulated relative hemodynamic changes between the absence and presence of transductal left-to-right shunt flow closely match the target data. Changes for the bidirectional-shunt condition reproduce the correct direction and order of magnitude, though not the exact values. Notably, the model replicates the paradoxical reduction in LVO seen with bidirectional shunting, allowing further exploration of this finding. The model also generates Doppler and instantaneous flow patterns during ductal closure; Figure 5 compares simulation outputs with published transductal Doppler data.
 
 **Fig. 5** (`Fig5_cardiovascular_pda_doppler_bidirectional.png`,
 `Fig5_cardiovascular_pda_doppler_nonrestrictive.png`, `Fig5_cardiovascular_pda_doppler_restrictive.png`).
-Target PDA Doppler flow-rate data from van Laere et al. [22] (left) and EXPLAIN simulation results
-(right), for bidirectional, non-restrictive left-to-right, and restrictive left-to-right transductal
-flow.
+Target PDA Doppler flow-rate data from van Laere et al. [22] (left) and EXPLAIN simulation results (right), for bidirectional, non-restrictive left-to-right, and restrictive left-to-right transductal flow.
 
 There is again a very close match of simulation results to target data. A minor but noteworthy
 observation in the target data — a very short early-systolic dip in the Doppler velocity for
@@ -501,26 +313,9 @@ restrictive left-to-right flow — is matched by the model output.
 #### 3.1.3 Pulmonary hypertension (PH)
 
 Pulmonary hypertension (PH) involves elevated pulmonary vascular resistance with right-to-left
-shunting through the ductus arteriosus and/or foramen ovale. Invasive neonatal hemodynamic data are
-scarce because cardiac catheterization is rarely performed; most clinical assessment relies on
-echocardiography. Jones and Crossland [23] report representative pressures, flows, and oxygen
-saturations across PH stages, reflecting current clinical understanding despite limited pooled data.
-In the EXPLAIN model, pulmonary hypertension is simulated by increasing the resistance in the
-pathways connecting the left and right pulmonary artery capacitances (PAAL, PAAR) to the left and
-right lung capacitances (LL, RL) and by modifying the baseline elastance of the pulmonary-artery
-capacitance to represent varying degrees of severity. As in the PDA case, the underlying patient
-baseline was established with the calibration pipeline of Box 1; the pulmonary-resistance and
-pulmonary-artery-elastance changes representing each stage were then applied on top of that
-calibrated baseline.
+shunting through the ductus arteriosus and/or foramen ovale. Invasive neonatal hemodynamic data are scarce because cardiac catheterization is rarely performed; most clinical assessment relies on echocardiography. Jones and Crossland [23] report representative pressures, flows, and oxygen saturations across PH stages, reflecting current clinical understanding despite limited pooled data. In the EXPLAIN model, pulmonary hypertension is simulated by increasing the resistance in the pathways connecting the left and right pulmonary artery capacitances (PAAL, PAAR) to the left and right lung capacitances (LL, RL) and by modifying the baseline elastance of the pulmonary-artery capacitance to represent varying degrees of severity. As in the PDA case, the underlying patient baseline was established with the calibration pipeline of Supplementary Methods S1; the pulmonary-resistance and pulmonary-artery-elastance changes representing each stage were then applied on top of that calibrated baseline.
 
-**Table 4. Pulmonary hypertension — target data from Jones and Crossland [23] and simulation
-results** for patients with three levels of persistent pulmonary hypertension (PPHN). Target data
-were converted from L·min⁻¹·m⁻² to mL·kg⁻¹·min⁻¹ using a body surface area of 0.221 m² (length 50 cm,
-weight 3.515 kg). Q_p pulmonary blood flow (mL·kg⁻¹·min⁻¹), Q_s systemic blood flow
-(mL·kg⁻¹·min⁻¹), Q_p/Q_s their ratio, TPG transpulmonary gradient (PAP − left-atrial pressure, mmHg),
-PVR pulmonary vascular resistance (mmHg·min·mL⁻¹), RVP right-ventricular pressure (mmHg), LVP left-
-ventricular pressure (mmHg), PAP pulmonary-arterial pressure (mmHg), ABP aortic/arterial pressure
-(mmHg).
+**Table 4. Pulmonary hypertension — target data from Jones and Crossland [23] and simulation results** for patients with three levels of persistent pulmonary hypertension (PPHN). Target data were converted from L·min⁻¹·m⁻² to mL·kg⁻¹·min⁻¹ using a body surface area of 0.221 m² (length 50 cm, weight 3.515 kg). Q_p pulmonary blood flow (mL·kg⁻¹·min⁻¹), Q_s systemic blood flow (mL·kg⁻¹·min⁻¹), Q_p/Q_s their ratio, TPG transpulmonary gradient (PAP − left-atrial pressure, mmHg), PVR pulmonary vascular resistance (mmHg·min·mL⁻¹), RVP right-ventricular pressure (mmHg), LVP left- ventricular pressure (mmHg), PAP pulmonary-arterial pressure (mmHg), ABP aortic/arterial pressure (mmHg).
 
 | Quantity | Target: Early PH | Target: Severe PH (no PDA) | Target: Severe PPHN + PDA | Sim: Early PH | Sim: Severe PH (no PDA) | Sim: Severe PH + PDA |
 |---|---|---|---|---|---|---|
@@ -534,112 +329,47 @@ ventricular pressure (mmHg), PAP pulmonary-arterial pressure (mmHg), ABP aortic/
 | PAP | 58/28 | 70/38 | 60/30 | 60/30 | 72/39 | 63/32 |
 | ABP | 64/32 | 50/24 | 60/30 | 63/31 | 52/26 | 61/31 |
 
-The target data reflect current clinical understanding. The model closely matches the magnitude and
-direction of the changes in Q_p, Q_s and the ventricular and arterial pressures across the different
-states of PH.
-
----
-
+The target data reflect current clinical understanding. The model closely matches the magnitude and direction of the changes in Q_p, Q_s and the ventricular and arterial pressures across the different states of PH.
 ## 4. Discussion
 
-Explanatory models are real-time, interactive, animated visualizations of human physiology that help
-acute-care physicians carry out the challenging cognitive tasks they face in clinical practice and
-research. EXPLAIN is an explanatory model for neonatal intensive care. An integrated model of
-cardiorespiratory physiology underlies this tool. In this paper the cardiovascular model is
-presented. This model is validated — and its explanatory use illustrated — for the conditions
-persistent ductus arteriosus (PDA) and acute pulmonary hypertension (aPH). The model reproduces key
-baseline hemodynamic features for term neonates, as well as the characteristic changes observed in
-PDA and PH. Reproducibility and use of simulation results, and expansions of the cardiovascular
-model, are enabled by making the numerical values of model parameters, the model source code, and
-the EXPLAIN user software available.
+Explanatory models are real-time, interactive, animated visualizations of human physiology that help acute-care physicians carry out the challenging cognitive tasks they face in clinical practice and research. EXPLAIN is an explanatory model for neonatal intensive care. An integrated model of cardiorespiratory physiology underlies this tool. In this paper the cardiovascular model is presented. This model is validated — and its explanatory use illustrated — for the conditions persistent ductus arteriosus (PDA) and acute pulmonary hypertension (aPH). The model reproduces key baseline hemodynamic features for term neonates, as well as the characteristic changes observed in PDA and PH. Reproducibility and use of simulation results, and expansions of the cardiovascular model, are enabled by making the numerical values of model parameters, the model source code, and the EXPLAIN user software available.
 
 ### 4.1 Model originality
 
 The frequently used and well-validated Beneken model for the adult and infant uncontrolled
-cardiovascular systems was expanded with specific tissue groups and shunts needed to simulate the
-neonatal conditions mentioned in the introduction. Non-linear characteristics of resistances and
-capacitances are given in the mathematical model section. The model of the baroreflex is an expansion
-of the well-documented van Meurs model. The inclusion of an explicit variable for the sympatho-vagal
-balance results in a compact model with high explanatory value. A simple model of the Doppler flow
-pattern is presented. A further element of originality is that EXPLAIN is fitted to a patient not by
-hand but by an AI-assisted, closed-loop pipeline (Box 1; Fig. 6; companion paper [24]), which makes
-patient-specific instantiation reproducible and keeps every automated adjustment within the same
-bounds as a manual edit.
-
-**Fig. 6** (`Fig6_AI_parameterization.png`, `Fig6_AI_parameterization.svg`).
-AI-assisted patient-specific parameterization (Box 1). An LLM agent interprets the available clinical
-targets (*x\**) and emits a validated specification and allowlisted commands; it does not modify
-equations or state directly. A deterministic calibrator then fits the mechanistic model: a single
-structural pass scales the model to body size and aligns the baroreflex set-point to the target mean
-arterial pressure, after which one physiologically interpretable lever per target (Box 1) is nudged —
-a proportional seed followed by the secant method — as the model is advanced and each quantity is
-re-measured as a beat-averaged mean, until every residual falls within its clinician-meaningful
-tolerance. The same loop supports offline construction of a new calibrated patient and live retuning
-of a running simulation. The full method is given in the companion paper [24].
+cardiovascular systems was expanded with specific tissue groups and shunts needed to simulate the neonatal conditions mentioned in the introduction. Non-linear characteristics of resistances and capacitances are given in the mathematical model section. The model of the baroreflex is an expansion of the well-documented van Meurs model. The inclusion of an explicit variable for the sympatho-vagal balance results in a compact model with high explanatory value. A simple model of the Doppler flow pattern is presented. A further element of originality is that EXPLAIN is fitted to a patient not by hand but by an AI-assisted, closed-loop pipeline (Supplementary Methods S1, Fig. S1; companion paper [24]), which makes patient-specific instantiation reproducible and keeps every automated adjustment within the same bounds as a manual edit.
 
 ### 4.2 Model validity
 
-Validation consists of comparing model simulation results to target data from the literature. A close
-quantitative agreement for baseline term hemodynamics is observed. PDA states result in the expected
-relative changes in major flow ratios and in Doppler wave morphology. The paradoxical reduction in
-LVO in bidirectional PDA, and the occurrence of the early-systolic flow reduction in restrictive PDA
-— both reported clinically but often under-represented in simplified cardiovascular models — emerged
-naturally from the interaction of shunt dynamics, pulmonary vascular tone and control responses.
-EXPLAIN allows for the visualization and manipulation of the underlying variables and thereby
-contributes to the explanation and understanding of these phenomena. In PH, the model captures the
-direction and magnitude of the major hemodynamic shifts and produces ductal Doppler patterns
-consistent with published waveforms.
+Validation consists of comparing model simulation results to target data from the literature. A close quantitative agreement for baseline term hemodynamics is observed. PDA states result in the expected relative changes in major flow ratios and in Doppler wave morphology. The paradoxical reduction in LVO in bidirectional PDA, and the occurrence of the early-systolic flow reduction in restrictive PDA — both reported clinically but often under-represented in simplified cardiovascular models — emerged naturally from the interaction of shunt dynamics, pulmonary vascular tone and control responses. EXPLAIN allows for the visualization and manipulation of the underlying variables and thereby contributes to the explanation and understanding of these phenomena. In PH, the model captures the direction and magnitude of the major hemodynamic shifts and produces ductal Doppler patterns consistent with published waveforms.
 
 ### 4.3 Reproducibility of results and model expansion
 
 A core aim was to create a tool that the authors and other investigators can use to reproduce the
-conditions used in validation, and that allows for the simulation of other conditions of educational
-and research value. EXPLAIN achieves this. The EXPLAIN aim favors an underlying cardiovascular model
-with a structure that has clear anatomical and physiological interpretations. This aspect also
-facilitates modification and expansion by qualified researchers and developers, a goal further
-reinforced by making the model source code available.
+conditions used in validation, and that allows for the simulation of other conditions of educational and research value. EXPLAIN achieves this. The EXPLAIN aim favors an underlying cardiovascular model with a structure that has clear anatomical and physiological interpretations. This aspect also facilitates modification and expansion by qualified researchers and developers, a goal further reinforced by making the model source code available.
 
 ### 4.4 Limitations
 
-Quantitative neonatal hemodynamic data — particularly invasive measurements in PH patients — remain
-sparse and heterogeneous; some validation therefore relies on representative clinical ranges, Doppler
-morphology, and expert consensus. Shunt diameter–resistance relationships assume idealized
-laminar/turbulent transitions, and geometric variability (ductal length, septal shape) is simplified.
-Despite these constraints, the model simulation results match published data. The model also provides
-a basis for further systematic refinement.
+Quantitative neonatal hemodynamic data — particularly invasive measurements in PH patients — remain sparse and heterogeneous; some validation therefore relies on representative clinical ranges, Doppler morphology, and expert consensus. Shunt diameter–resistance relationships assume idealized laminar/turbulent transitions, and geometric variability (ductal length, septal shape) is simplified. Despite these constraints, the model simulation results match published data. The model also provides a basis for further systematic refinement.
 
 ### 4.5 Future work
 
-Building on the AI-assisted parameterization pipeline used here (Box 1; companion paper [24]), future
-work will pursue a systematic sensitivity analysis to identify the most informative parameters,
-extend calibration from the present one-lever-per-target scheme to joint multi-target optimization
-for strongly coupled configurations, and undertake prospective validation of patient-specific fits
-against clinical data. In addition, the coupled cardiorespiratory framework will be applied to study
-the physiological effects of ventilation strategies, pulmonary vasodilators, and the mechanisms
-underlying transitional failure.
+Building on the AI-assisted parameterization pipeline used here (Supplementary Methods S1; companion paper [24]), future work will pursue a systematic sensitivity analysis to identify the most informative parameters, extend calibration from the present one-lever-per-target scheme to joint multi-target optimization for strongly coupled configurations, and undertake prospective validation of patient-specific fits against clinical data. In addition, the coupled cardiorespiratory framework will be applied to study the physiological effects of ventilation strategies, pulmonary vasodilators, and the mechanisms underlying transitional failure.
 
 ---
 
 ## Conclusion
 
-This paper presents original conceptual and mathematical models of the neonatal cardiovascular system
-for inclusion in an explanatory model for clinical researchers and educators. Simulation results
-match published target data in good approximation. The EXPLAIN educational software and model code
-are made available.
+This paper presents original conceptual and mathematical models of the neonatal cardiovascular system for inclusion in an explanatory model for clinical researchers and educators. Simulation results match published target data in good approximation. The EXPLAIN educational software and model code are made available.
 
 **Acknowledgements and potential conflicts of interest.** Supported in part by a grant from the
-Stichting Radboud universitair medisch centrum. Willem van Meurs is a paid consultant for Elevate
-Healthcare. None of the other authors have a potential conflict of interest to report.
+Stichting Radboud universitair medisch centrum. Willem van Meurs is a paid consultant for Elevate Healthcare. None of the other authors have a potential conflict of interest to report.
 
 ---
 
 ## References
 
-*In order of appearance (Vancouver, matching the series). Verified against PubMed on 2026-07-16 (full
-provenance and actionable findings in `P1_references_verified.md`). Refs 10, 12 and 15 are a
-textbook, a 1965 dissertation and a 1920 pre-MEDLINE paper respectively and are correctly not in
-PubMed. The AI-parameterization references [24]–[26] enter as a coupled insertion with Box 1 and the
-inline [24] anchors; [24] is blocked on the P6 preprint DOI (placeholder retained).*
+*In order of appearance (Vancouver, matching the series). Verified against PubMed on 2026-07-16 (full provenance and actionable findings in `P1_references_verified.md`). Refs 10, 12 and 15 are a textbook, a 1965 dissertation and a 1920 pre-MEDLINE paper respectively and are correctly not in PubMed. The AI-parameterization references [24]–[26] are cited from the compact in-body pointer (§2.3), the AI-use disclosure and the Discussion; the full pipeline text and Fig. S1 live in Supplementary Methods S1. [24] is blocked on the P6 preprint DOI (placeholder retained).*
 
 1. van Meurs WWL, Antonius TAJ. Explanatory models in neonatal intensive care: a tutorial. *Adv Simul (Lond).* 2018;3:27. PMID 30598843. doi:10.1186/s41077-018-0085-2.
 2. Allen WW, Power GG, Longo LD. Fetal O₂ changes in response to hypoxic stress: a mathematical model. *J Appl Physiol Respir Environ Exerc Physiol.* 1977;42(2):179–90. PMID 838643. doi:10.1152/jappl.1977.42.2.179.
@@ -664,11 +394,8 @@ inline [24] anchors; [24] is blocked on the P6 preprint DOI (placeholder retaine
 21. Bischoff AR, et al. Assessment of superior vena cava flow and cardiac output in different patterns of patent ductus arteriosus shunt. *Echocardiography.* 2021;38(9):1524–1533. PMID 34309068. doi:10.1111/echo.15163.
 22. van Laere D, et al. Application of NPE in the assessment of a patent ductus arteriosus. *Pediatr Res.* 2018;84(Suppl 1):46–56. PMID 30072803. doi:10.1038/s41390-018-0077-x.
 23. Jones CB, Crossland DS. The interplay between pressure, flow, and resistance in neonatal pulmonary hypertension. *Semin Fetal Neonatal Med.* 2022;27(4):101371. PMID 35787350. doi:10.1016/j.siny.2022.101371.
-24. Antonius TAJ, van Meurs WL, Westerhof BE, de Boode WP. An AI-assisted closed-loop method for patient-specific parameterization of a whole-body neonatal physiology model. *Pediatr Res.* ‹year; in press›. Preprint: bioRxiv ‹preprint DOI pending — fill once P6 [P6] is posted›. *(Companion paper; cited inline as [24] in the Abstract, Introduction, Box 1 and Discussion.)*
+24. Antonius TAJ, van Meurs WL, Westerhof BE, de Boode WP. An AI-assisted closed-loop method for patient-specific parameterization of a whole-body neonatal physiology model. *Pediatr Res.* ‹year; in press›. Preprint: bioRxiv ‹preprint DOI pending — fill once P6 [P6] is posted›. *(Companion paper; cited inline as [24] in the Introduction, the §2.3 parameterization pointer (Supplementary Methods S1) and the Discussion.)*
 25. Anthropic. Claude [large language model]. Anthropic PBC; 2025. Available from: <https://claude.com>. *(Confirm exact model/version and access date at submission.)*
 26. Anthropic. Claude Agent SDK [software]; 2025. Available from: <https://platform.claude.com/docs/en/api/agent-sdk>.
 
-*The software archive (GitHub repository + Zenodo concept DOI 10.5281/zenodo.21389097) is stated
-directly in the availability text of §2.3, matching the master manuscript; it carries no separate
-citation number. Companion series papers are cited as unnumbered tokens [P3a]/[P6]; they resolve to
-their final numbers at series assembly.*
+*The software archive (GitHub repository + Zenodo concept DOI 10.5281/zenodo.21389097) is stated directly in the availability text of §2.3, matching the master manuscript; it carries no separate citation number. Companion series papers are cited as unnumbered tokens [P3a]/[P6]; they resolve to their final numbers at series assembly.*
