@@ -30,15 +30,7 @@ full treatment.*
 
 ## 1. Introduction
 
-Mechanistic, lumped-parameter models represent the circulation, the respiratory system and their
-regulation as networks of compartments governed by interpretable physical parameters — elastances,
-resistances, unstressed volumes, diffusion constants, shunt geometries — each corresponding to a
-physiological property a clinician can reason about. That interpretability carries a well-known cost.
-A whole-body neonatal model of the kind described in the companion papers has of order a hundred
-components and several hundred free parameters, while the clinic supplies only a handful of measured
-quantities per patient — a heart rate, a mean arterial pressure, a central venous pressure, a cardiac
-output or its surrogate, an oxygen saturation and a blood gas. Fitting the model to a patient is
-therefore a severely underdetermined inverse problem: many parameter combinations reproduce the same
+Mechanistic, lumped-parameter models represent the circulation, the respiratory system and their regulation as networks of compartments governed by interpretable physical parameters — elastances, resistances, unstressed volumes, diffusion constants, shunt geometries — each corresponding to a physiological property a clinician can reason about. That interpretability carries a well-known cost. A whole-body neonatal model of the kind described in the companion papers has of order a hundred components and several hundred free parameters, while the clinic supplies only a handful of measured quantities per patient — a heart rate, a mean arterial pressure, a central venous pressure, a cardiac output or its surrogate, an oxygen saturation and a blood gas. Fitting the model to a patient is therefore a severely underdetermined inverse problem: many parameter combinations reproduce the same
 few measurements.
 
 The conventional remedy is expert hand-tuning: a modeller adjusts parameters by trial and error until
@@ -272,6 +264,12 @@ is identical offline and live. The offline builder runs headlessly in Node; the 
 the simulation Web Worker (shared Methods S5). The full pipeline — the specification schema, the
 command allowlist and the subprocess invocation of the builder — is described above and is reproduced
 by the scripts named at the head of this paper.
+
+**Data and code availability.** The interactive model is freely available at
+https://explain-modeling.com; the complete, annotated engine source code — including the calibrator,
+the offline builder and the sensitivity-analysis harness named here — is publicly available at
+https://github.com/Dobutamine/explain-engine and archived with a persistent identifier at
+https://doi.org/10.5281/zenodo.21389097 [4].
 
 **Use of AI in this study.** A large language model (Claude, Anthropic) is used as a component of the
 parameterization *method*: it interprets clinical inputs and emits validated, allowlisted
@@ -542,19 +540,27 @@ identifiability results are provided as **Supplementary Information** (`P6_suppl
 
 ## References
 
-See `_references.md`. Core citations for this paper: Anthropic Claude (large language model)
-and the Claude Agent SDK (software); Burden & Faires or van Meurs for the secant/root-finding method;
-the cardiovascular and respiratory companion papers for the model and lever definitions. Reuse the
-already-drafted software/AI citations of `circ-paper-additions.md` Block G, and confirm the
-exact Claude model/version and access date, and the AI-disclosure placement, against the journal's
-current policy before submission.
+*In order of appearance (Vancouver, matching the series). The sensitivity-analysis method sources and
+the software archive are the verified entries curated in `_references.md`; several SA sources are
+canonical statistics/methods papers not indexed in PubMed and correctly carry no PMID. The by-name
+citations in the text receive their inline numeric [N] anchors at final assembly (series convention;
+only the software citation [4] and the companion tokens [P1]/[P2]/[P5] are wired here). Confirm the
+exact Claude model/version and access date against the journal's current policy before submission.*
 
-Sensitivity-analysis references (Sections 2.6, 3.3 and the Supplement): Morris (Technometrics 1991);
-Campolongo, Cariboni & Saltelli (Environ Model Softw 2007); Sobol′ (Math Comput Simul 2001); Saltelli
-et al. (*Global Sensitivity Analysis: The Primer*, 2008; Comput Phys Commun 2010); Jansen (Comput Phys
-Commun 1999); Marino, Hogue, Ray & Kirschner (J Theor Biol 2008); Raue et al. (Bioinformatics 2009);
-Gutenkunst et al. (PLoS Comput Biol 2007); Transtrum et al. (J Chem Phys 2015); Eck et al. (Int J Numer
-Method Biomed Eng 2016); and **Messmore, DeCampli & Kassab** (Cardiovasc Eng Technol 2026,
-doi:10.1007/s13239-026-00839-9) — the neonatal transposition sensitivity-analysis precedent that
-independently reproduces the oxygenation result (SpO₂ most sensitive to systemic resistance and ductal
-diameter). Verify Messmore's final citation details against PubMed/DOI at assembly.
+1. Anthropic. Claude [large language model]. Anthropic PBC; 2025. Available from: https://claude.com. *(Confirm exact model/version and access date at submission.)*
+2. Anthropic. Claude Agent SDK [software]. Anthropic PBC; 2025. Available from: https://platform.claude.com/docs/en/api/agent-sdk.
+3. Burden RL, Faires JD. *Numerical Analysis.* 9th ed. Boston: Brooks/Cole, Cengage Learning; 2011. *(Secant method; see also van Meurs, cardiovascular paper [P1] ref 10.)*
+4. Antonius T. *Explain: a whole-body physiological simulation engine* (Version v0.1.0) [Software]. Zenodo; 2026. doi:10.5281/zenodo.21389097 (concept/all-versions DOI). Source: https://github.com/Dobutamine/explain-engine (MIT). Interactive model: https://explain-modeling.com.
+5. Morris MD. Factorial sampling plans for preliminary computational experiments. *Technometrics.* 1991;33(2):161–174.
+6. Campolongo F, Cariboni J, Saltelli A. An effective screening design for sensitivity analysis of large models. *Environ Model Softw.* 2007;22(10):1509–1518.
+7. Sobol′ IM. Global sensitivity indices for nonlinear mathematical models and their Monte Carlo estimates. *Math Comput Simul.* 2001;55(1–3):271–280.
+8. Saltelli A, Ratto M, Andres T, Campolongo F, Cariboni J, Gatelli D, et al. *Global Sensitivity Analysis: The Primer.* Chichester: Wiley; 2008. And: Saltelli A, Annoni P, Azzini I, Campolongo F, Ratto M, Tarantola S. Variance based sensitivity analysis of model output: design and estimator for the total sensitivity index. *Comput Phys Commun.* 2010;181(2):259–270.
+9. Jansen MJW. Analysis of variance designs for model output. *Comput Phys Commun.* 1999;117(1–2):35–43.
+10. Marino S, Hogue IB, Ray CJ, Kirschner DE. A methodology for performing global uncertainty and sensitivity analysis in systems biology. *J Theor Biol.* 2008;254(1):178–196. PMID 18572196. doi:10.1016/j.jtbi.2008.04.011.
+11. Raue A, Kreutz C, Maiwald T, Bachmann J, Schilling M, Klingmüller U, et al. Structural and practical identifiability analysis of partially observed dynamical models by exploiting the profile likelihood. *Bioinformatics.* 2009;25(15):1923–1929. PMID 19505944. doi:10.1093/bioinformatics/btp358.
+12. Gutenkunst RN, Waterfall JJ, Casey FP, Brown KS, Myers CR, Sethna JP. Universally sloppy parameter sensitivities in systems biology models. *PLoS Comput Biol.* 2007;3(10):e189. PMID 17922568. doi:10.1371/journal.pcbi.0030189.
+13. Transtrum MK, Machta BB, Brown KS, Daniels BC, Myers CR, Sethna JP. Perspective: sloppiness and emergent theories in physics, biology, and beyond. *J Chem Phys.* 2015;143(1):010901. PMID 26156455. doi:10.1063/1.4923066.
+14. Eck VG, Donders WP, Sturdy J, Feinberg J, Delhaas T, Hellevik LR, et al. A guide to uncertainty quantification and sensitivity analysis for cardiovascular applications. *Int J Numer Method Biomed Eng.* 2016;32(8):e02755. PMID 26475178. doi:10.1002/cnm.2755.
+15. Messmore M, DeCampli W, Kassab A. Computational model for predicting optimal clinical intervention in pre-operative neonates with transposition of the great arteries. *Cardiovasc Eng Technol.* 2026. PMID 42115554. doi:10.1007/s13239-026-00839-9. *(Neonatal LPM sensitivity-analysis precedent; independently finds SpO₂ most sensitive to systemic resistance and ductal diameter, corroborating the operating-point oxygenation result.)*
+
+*Companion papers (series), cited as unnumbered tokens that resolve at assembly: [P1] Cardiovascular · [P2] Respiratory, gas exchange and metabolism · [P5] Integrated model and virtual-patient library · [P7] duct-/foramen-ovale-dependent congenital heart disease. Cite [P6] itself only where a companion refers back; full citations/DOIs at assembly (cite the P6 bioRxiv preprint until published).*
