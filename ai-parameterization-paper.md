@@ -20,9 +20,9 @@ full treatment.*
 
 **Background:** Lumped-parameter neonatal models are prized for interpretable parameters but are underdetermined — many parameters, few bedside measurements — so individual fitting has required slow, irreproducible hand-tuning, and existing in-silico neonatal models are run with generic parameters.
 
-**Methods:** An AI-assisted closed-loop pipeline parameterizes a real-time whole-body neonatal simulator by separating two usually-conflated roles. An interpretation layer — a large language model (Claude) — reads the clinical description and emits a validated, allowlisted specification (baseline, targets, pathophysiology), never editing equations or state. A deterministic calibrator then assigns one interpretable lever per target and drives each to a clinician-meaningful tolerance with a proportional-seed/secant root-finder, after allometric and gestational-age seeding and baroreflex set-point alignment so the model's control loops defend the fit. One calibrator serves offline construction and live retuning.
+**Methods:** An AI-assisted closed-loop pipeline parameterizes a real-time whole-body neonatal simulator by separating two roles. An interpretation layer — a large language model (Claude) — reads the clinical description and emits a validated, allowlisted specification (baseline, targets, pathophysiology), never editing equations or state. A deterministic calibrator then assigns one interpretable lever per target and drives each to tolerance with a proportional-seed/secant root-finder, after allometric and gestational-age seeding and baroreflex set-point alignment so the model's control loops defend the fit. One calibrator serves offline construction and live retuning.
 
-**Results:** For a 28-week, 1.0-kg preterm construction, five targets (heart rate, mean arterial pressure, cardiac output, SpO₂, PCO₂) converged within tolerance in two iterations, untargeted vitals staying in preterm ranges; a running simulation retuned in three. A variance-based sensitivity analysis (Sobol′/PRCC, estimator-validated) confirms the one-lever design for the pressure targets and flags where coupling or operating point weakens it.
+**Results:** For a 28-week, 1.0-kg preterm construction, five targets (heart rate, mean arterial pressure, cardiac output, SpO₂, PCO₂) converged within tolerance in two iterations, untargeted vitals in preterm ranges; a running simulation retuned in three. A variance-based sensitivity analysis (Sobol′/PRCC, estimator-validated) confirms the one-lever design for the pressure targets and flags where coupling or operating point weakens it.
 
 **Conclusion:** Separating interpretation from fitting, and bounding every automated adjustment, makes patient-specific instantiation rapid, auditable and reproducible.
 
@@ -31,46 +31,38 @@ full treatment.*
 ## 1. Introduction
 
 Mechanistic, lumped-parameter models represent the circulation, the respiratory system and their
-regulation as networks of compartments whose behaviour is governed by physical parameters —
-elastances, resistances, unstressed volumes, diffusion constants, shunt geometries. Such models are
-valued precisely because their parameters are interpretable: each corresponds to a physiological
-property a clinician can reason about. But this interpretability comes with a well-known cost. A
-whole-body neonatal model of the kind described in the companion papers has of order a hundred
-components and several hundred free parameters, while the clinic supplies only a handful of directly
-measured quantities for any given patient — typically a heart rate, a mean arterial pressure, a
-central venous pressure, a cardiac output or its surrogate, an oxygen saturation and an arterial
-blood gas. Fitting the model to a patient is therefore a severely underdetermined inverse problem:
-many parameter combinations reproduce the same few measurements, and most of the parameter space is
-unconstrained by data.
+regulation as networks of compartments governed by interpretable physical parameters — elastances,
+resistances, unstressed volumes, diffusion constants, shunt geometries — each corresponding to a
+physiological property a clinician can reason about. That interpretability carries a well-known cost.
+A whole-body neonatal model of the kind described in the companion papers has of order a hundred
+components and several hundred free parameters, while the clinic supplies only a handful of measured
+quantities per patient — a heart rate, a mean arterial pressure, a central venous pressure, a cardiac
+output or its surrogate, an oxygen saturation and a blood gas. Fitting the model to a patient is
+therefore a severely underdetermined inverse problem: many parameter combinations reproduce the same
+few measurements.
 
-The conventional remedy is expert hand-tuning. A modeller who knows the system adjusts parameters by
-trial and error until the simulated monitor matches the clinical picture. This works, but it is slow,
-it is difficult to reproduce, it is hard to audit, and it scales poorly — every new patient is a
-fresh manual fitting exercise. The difficulty of parameterization has been a persistent barrier to
-using lumped-parameter models at the bedside, where an individualized model would have to be
-produced quickly and reliably from the data at hand.
+The conventional remedy is expert hand-tuning: a modeller adjusts parameters by trial and error until
+the simulated monitor matches the clinical picture. This works, but it is slow, hard to reproduce and
+audit, and scales poorly — every new patient is a fresh manual fit. Parameterization has thus been a
+persistent barrier to using lumped-parameter models at the bedside, where an individualized model must
+be produced quickly and reliably from the data at hand.
 
-This paper describes how EXPLAIN addresses that barrier. The method rests on two observations. First,
-although the full inverse problem is ill-posed, much of the modeller's expertise can be encoded as a
-structural fact about the model: for each clinically measured quantity there is usually one dominant,
-monotone parameter — one lever — that is the natural controller of that quantity, provided the lever
-is chosen to act with, rather than against, the model's own active control loops. Choosing that
+The method rests on two observations. First, although the full inverse problem is ill-posed, much of
+the modeller's expertise is a structural fact about the model: for each measured quantity there is
+usually one dominant, monotone parameter — one lever — that is its natural controller, provided the
+lever is chosen to act with, rather than against, the model's own active control loops. That
 observable-to-controllable pairing turns the coupled high-dimensional fit into a set of nearly
-independent one-dimensional root-finding problems, each solvable by a robust, derivative-free
-numerical method. Second, the part of the task that genuinely requires judgement — reading a messy
-clinical description and deciding what the targets and the pathophysiology are — is exactly what a
-modern large language model does well, and is exactly the part that should never be allowed to touch
-the model's equations or state directly.
+independent one-dimensional root-finding problems, each solvable by a robust, derivative-free method.
+Second, the part that genuinely requires judgement — reading a messy clinical description and deciding
+the targets and pathophysiology — is exactly what a large language model does well, and exactly the
+part that should never touch the model's equations or state directly.
 
-EXPLAIN accordingly parameterizes a patient with a two-layer pipeline. An interpretation layer, a
-large language model, translates the available clinical information into a validated, bounded
-specification. A deterministic calibration layer fits the mechanistic model to that specification by
-a closed-loop, one-lever-per-target root-finder. The two roles are strictly separated: the language
-model performs no numerical fitting, and the calibrator performs no interpretation. The same
-calibrator supports both the offline construction of a new, fully calibrated patient scenario and the
-live retuning of an already-running simulation to new targets. In what follows we state the problem
-precisely (Section 2.2), describe the interpretation layer (Section 2.3) and the calibration layer
-(Section 2.4), and demonstrate convergence on representative neonatal targets (Section 3).
+EXPLAIN accordingly parameterizes a patient with a two-layer pipeline. An interpretation layer (a
+large language model) translates the clinical information into a validated, bounded specification; a
+deterministic calibration layer fits the model to it by a closed-loop, one-lever-per-target
+root-finder. The roles are strictly separated — the language model performs no numerical fitting, the
+calibrator no interpretation — and the same calibrator serves both offline construction of a new
+calibrated patient and live retuning of an already-running simulation.
 
 ---
 
@@ -78,17 +70,15 @@ precisely (Section 2.2), describe the interpretation layer (Section 2.3) and the
 
 ### 2.1 Overview
 
-The pipeline has two layers with a single, narrow interface between them: a **specification** — a
-baseline scenario, a set of target values *x\** for named measured quantities, optional
-pathophysiological modifiers, and optional per-target tolerances. The **interpretation layer** (a
-large language model) produces the specification from clinical inputs; the **calibration layer** (a
-deterministic root-finder) consumes it and fits the mechanistic model. Because the interface is an
-explicit, machine-checkable object rather than a stream of parameter writes, every action the
-language model can take is validated against the same schema, unit conversions and physiological
-bounds as a manual edit in the interactive application, and the calibrator receives only clean
-numerical targets. The composability substrate that makes this possible — the three-layer
-effective-value decomposition of every physical parameter — is shared with the other papers in the
-series and summarized in Eq. 1.
+The pipeline has two layers with a single, narrow interface: a **specification** — a baseline
+scenario, target values *x\** for named quantities, optional pathophysiological modifiers, and optional
+per-target tolerances. The **interpretation layer** (a large language model) produces the specification
+from clinical inputs; the **calibration layer** (a deterministic root-finder) consumes it and fits the
+model. Because the interface is an explicit, machine-checkable object rather than a stream of parameter
+writes, the calibrator receives only clean numerical targets and every language-model action is
+validated exactly as a manual edit is (Section 2.3). The composability substrate that makes this
+possible — the three-layer effective-value decomposition of every physical parameter — is shared across
+the series and summarized in Eq. 1.
 
 **Eq. 1** (effective-value composition; see shared Methods S2). Every physical parameter *p* is used
 through an effective value
@@ -124,48 +114,41 @@ physiology, which the relaxation loop of Section 2.4.2 resolves.
 
 ### 2.3 Interpretation layer (large language model)
 
-The interpretation layer is a large language model agent (Claude, Anthropic, driven through the
-Claude Agent SDK). It reads the clinical description of the patient — free text, a list of monitor
-values, or an attached report (PDF or CSV) — and produces the specification: a baseline scenario name,
-a set of target values, named pathophysiological modifiers (for example a respiratory-distress
-severity or a pulmonary-vascular-resistance scaling), and optional tolerance overrides. Structurally
-this is a small JSON object (the `baseline`, `targets`, `pathophysiology` and `tolerance` fields of
-the builder's specification schema).
+The interpretation layer is a large language model agent (Claude, Anthropic, via the Claude Agent
+SDK). It reads the clinical description — free text, monitor values, or an attached report (PDF or
+CSV) — and produces the specification: a baseline scenario name, target values, named
+pathophysiological modifiers (e.g. a respiratory-distress severity or a pulmonary-vascular-resistance
+scaling), and optional tolerance overrides, as a small JSON object (the `baseline`, `targets`,
+`pathophysiology` and `tolerance` fields of the builder's schema).
 
-Two properties make this safe to automate. First, every model-facing action the agent can emit is
-drawn from a fixed allowlist of commands and is validated before execution against the *same*
-parameter schema, unit conversions and physiological bounds used by the interactive parameter editor;
-an automatically generated command therefore behaves exactly like a vetted manual edit, and the agent
-cannot reach a parameter, or a value, that the interface itself would refuse. Second, the two entry
-points the agent can invoke are deliberately coarse-grained and auditable: a **build** command, which
-carries a full specification and constructs a new calibrated patient offline, and a **tune** command,
-which carries a set of live targets and retunes the running model. The build command is executed as a
-fixed subprocess invocation of the calibration builder with the specification supplied on standard
-input — not as a shell string — with the baseline scenario name validated against a restrictive
-pattern; the resulting calibrated scenario is returned to the application as an artifact and loaded.
-The tune command is restricted to the canonical list of live-tunable targets and to numeric values,
-and is gated to the application's full-control scope. The language model never edits an equation, a
-state variable or a parameter directly; it only emits validated specifications and allowlisted
-commands. All numerical fitting is done by the deterministic layer described next. (The use of the
-language model as a component of the research method, not as an author or a generator of scientific
-content, is disclosed in Section 2.5 in accordance with journal policy.)
+Two properties make this safe to automate. First, every model-facing action the agent emits is drawn
+from a fixed command allowlist and validated before execution against the *same* schema, unit
+conversions and physiological bounds as the interactive parameter editor, so an automated command
+behaves exactly like a vetted manual edit and cannot reach a parameter or value the interface would
+refuse. Second, the two entry points are deliberately coarse and auditable: a **build** command
+carries a full specification and constructs a new calibrated patient offline (a fixed subprocess
+invocation of the builder with the specification on standard input, not a shell string, the baseline
+name validated against a restrictive pattern), and a **tune** command carries live targets and retunes
+the running model (restricted to the canonical live-tunable targets and numeric values, gated to the
+application's full-control scope). The language model never edits an equation, state variable or
+parameter directly — it only emits validated specifications and allowlisted commands; all numerical
+fitting is done by the deterministic layer below (its use as a method component, not an author, is
+disclosed in Section 2.5).
 
 ### 2.4 Calibration layer (deterministic closed-loop root-finder)
 
 #### 2.4.1 One-dimensional controllers
 
-The calibrator assigns one controller to each target. A controller couples a lever *l* (a model
-parameter, written through a setter that respects Eq. 1) to a measured quantity *x* read from the
-monitor, and updates *l* to drive *x* toward its target *x\**. When fewer than two samples are
-available the update is a proportional seed,
+The calibrator assigns one controller per target, coupling a lever *l* (written through a setter that
+respects Eq. 1) to a measured quantity *x* and updating *l* to drive *x* toward its target *x\**. With
+fewer than two samples the update is a proportional seed,
 
 > **Eq. 2** &nbsp; *l*_{k+1} = clamp( *l*_k + *s*·*g*·(*x\** − *x*_k),  *l*_lo,  *l*_hi )
 
-where *s* = ±1 is the known sign of the lever→measurement relationship, *g* a seed gain (in lever
-units per measured unit) and [*l*_lo, *l*_hi] the lever's physiological bounds. Once two samples
-(*l*_{k−1}, *x*_{k−1}) and (*l*_k, *x*_k) exist, the controller switches to the secant method — a
-derivative-free quasi-Newton root-find in which the local sensitivity of the measurement to the lever
-is estimated from the last two evaluations:
+where *s* = ±1 is the sign of the lever→measurement relationship, *g* a seed gain and [*l*_lo, *l*_hi]
+the lever's physiological bounds. Once two samples (*l*_{k−1}, *x*_{k−1}) and (*l*_k, *x*_k) exist, the
+controller switches to the secant method — a derivative-free root-find estimating the local
+sensitivity from the last two evaluations:
 
 > **Eq. 3** &nbsp; *m*_k = (*x*_k − *x*_{k−1}) / (*l*_k − *l*_{k−1}),  &nbsp; *l*_{k+1} = clamp( *l*_k + (*x\** − *x*_k)/*m*_k,  *l*_lo,  *l*_hi )
 
@@ -269,19 +252,17 @@ Section 2.4.1 then resolve only the residual mismatch.
 #### 2.4.5 Two entry points
 
 The same calibrator serves two uses. **Offline patient construction** starts from a fresh baseline,
-applies the structural pass and the iterative controllers, bakes the converged equilibrium state, and
-emits a complete, runnable scenario that the application loads immediately; because it starts from a
-clean baseline it may drive the size/resistance levers through the allometric-scaler groups. **Live
-in-place tuning** drives an already-running simulation to new targets without a reload: it pauses the
-real-time clock, runs the same relaxation loop synchronously against the live model, and resumes from
-the new operating point. The live path deliberately uses the composable persistent (`*_factor_ps`) and
-direct-setter levers rather than the scaler groups, because the scaler sets its layer absolutely and
-would overwrite the body-size and pathophysiological scaling already baked into the loaded patient;
-writing the persistent layer instead (Eq. 1) makes each tuning step compose on top of that scaling.
-Because the levers interact through the shared circulation (blood volume, venous tone and MAP, or
-contractility and CO), convergence of the joint problem is not guaranteed for arbitrary target
-combinations; in practice the physiological seeds and set-point alignment of the construction path
-keep the joint problem well conditioned (Section 4).
+applies the structural pass and the iterative controllers, bakes the converged equilibrium, and emits
+a runnable scenario the application loads immediately; starting from a clean baseline, it may drive the
+size/resistance levers through the allometric-scaler groups. **Live in-place tuning** drives an
+already-running simulation to new targets without a reload: it pauses the real-time clock, runs the
+same relaxation loop synchronously against the live model, and resumes from the new operating point.
+The live path uses the composable persistent (`*_factor_ps`) and direct-setter levers rather than the
+scaler groups, because the scaler writes its layer absolutely and would overwrite the scaling already
+baked into the loaded patient, whereas writing the persistent layer (Eq. 1) makes each step compose on
+top of it. Convergence of the joint problem is not guaranteed for arbitrary targets, because the levers
+interact through the shared circulation; in practice the construction path's seeds and set-point
+alignment keep it well conditioned (Section 4).
 
 ### 2.5 Software implementation, reproducibility and AI disclosure
 
@@ -301,37 +282,32 @@ journal's policy on the use of AI tools in research methods.
 
 ### 2.6 Sensitivity-analysis validation of the one-lever design
 
-The observable-to-controllable pairing of Table 1 is a structural *hypothesis* — that each measured
-target has one dominant, monotone, near-orthogonal lever — and closed-loop calibration is well-posed
-only insofar as that hypothesis holds. We tested it directly with a sensitivity analysis whose input
-space is deliberately the calibration-lever space itself: each analysed parameter is one lever,
-perturbed through the exact non-destructive mechanism and physiological bounds the calibrator uses
-(Eq. 1), so the analysis confirms or refutes the very design it underwrites rather than some proxy of
-it. One steady-state simulation is treated as a deterministic map **y** = g(**θ**) from the levers to
-the 17 routine monitor quantities, reproducible to machine precision. Body **weight is held fixed as
-measured context, not sampled**: the one-lever claim concerns a patient of *known* size, so weight is
-set from the birth weight and scaled allometrically (Section 2.4.4) before any lever is tuned;
-sampling weight instead answers a different, population-variance question in which body size trivially
-dominates every absolute pressure and flow (reported in the Supplement).
+The observable-to-controllable pairing of Table 1 is a structural *hypothesis* — that each target has
+one dominant, monotone, near-orthogonal lever — and closed-loop calibration is well-posed only insofar
+as it holds. We tested it with a sensitivity analysis whose input space is the calibration-lever space
+itself: each analysed parameter is one lever, perturbed through the exact non-destructive mechanism and
+bounds the calibrator uses (Eq. 1), so the analysis validates the very design it underwrites. One
+steady-state simulation is a deterministic map **y** = g(**θ**) from the levers to the 17 routine
+monitor quantities, reproducible to machine precision. Body **weight is held fixed as measured context,
+not sampled**: the one-lever claim concerns a patient of *known* size, so weight is set from the birth
+weight and scaled allometrically (Section 2.4.4) before any lever is tuned; sampling weight instead
+answers a population-variance question in which body size trivially dominates every absolute pressure
+and flow (Supplement).
 
-The analysis is a staged, screen-then-quantify campaign implemented as a pure-JavaScript, fixed-seed,
-in-repo tool driving the headless engine (`scripts/sa/`), with no external statistical dependency:
-local one-at-a-time (OAT) elasticities and the local Fisher-information matrix for dominance and
-identifiability; Morris elementary-effects screening over an expanded (~25-lever) set; variance-based
-**Sobol′** first-order (Sᵢ) and total (S_Tᵢ) indices — Saltelli sampling, Jansen estimators, bootstrap
-confidence intervals — as the quantitative core; and partial rank correlation (PRCC) as a
-monotonicity-aware, signed cross-check. The pure-JavaScript estimators were validated against the
-Ishigami function, whose Sobol indices are known in closed form, and agreed with the analytic values
-to within 0.011. Each designated lever is then held to a three-part test — **dominance** (largest Sᵢ
-for its target), **interaction-freeness** (Sᵢ ≈ S_Tᵢ, with the correct sign) and **identifiability**
-(an early, well-conditioned pick in a column-pivoted-QR ordering) — and passes only if it satisfies
-all three. Because the sensitivity structure of a nonlinear closed-loop model is itself a function of
-the operating point, the campaign is run at the term-neonate baseline — the design validation reported
-here — and, to characterise how that structure shifts with pathophysiology, at contrasting disease
-states (persistent pulmonary hypertension, severe diaphragmatic hernia, transposition, and preterm
-respiratory distress), whose physiological read-out is reported with the integrated model [P5]. The
-full methods, the justification for analysing at the lever altitude rather than over the
-several-hundred class-level parameters, and the complete identifiability results are given in the
+The analysis is a staged screen-then-quantify campaign implemented as a pure-JavaScript, fixed-seed,
+in-repo tool driving the headless engine (`scripts/sa/`), with no external statistical dependency: OAT
+elasticities and a local Fisher-information matrix for dominance and identifiability; Morris screening
+over an expanded (~25-lever) set; and variance-based **Sobol′** first-order (Sᵢ) and total (S_Tᵢ)
+indices (Saltelli sampling, Jansen estimators, bootstrap CIs) as the quantitative core, with partial
+rank correlation (PRCC) as a signed, monotonicity-aware cross-check. The estimators were validated
+against the Ishigami function (closed-form Sobol indices) to within 0.011. Each designated lever passes
+only if it meets a three-part test — **dominance** (largest Sᵢ for its target), **interaction-freeness**
+(Sᵢ ≈ S_Tᵢ, correct sign) and **identifiability** (an early, well-conditioned column-pivoted-QR pick).
+Because the sensitivity structure is itself a function of operating point, the campaign runs at the
+term-neonate baseline (the design validation here) and at contrasting disease states (persistent
+pulmonary hypertension, severe diaphragmatic hernia, transposition, preterm respiratory distress),
+whose physiological read-out is reported with the integrated model [P5]. Full methods, the
+justification for analysing at the lever altitude, and the complete identifiability results are in the
 Supplement.
 
 ---
@@ -396,30 +372,26 @@ iter 3:  hr 150.5/150 ✓  spo2 91.7/92 ✓   pco2 50.1/48 ✓
 → converged at iteration 3  (HR 151.2, Δ +1.2; SpO₂ 91.3, Δ −0.7; PCO₂ 50.2, Δ +2.2 — all within tolerance)
 ```
 
-The heart-rate set-point lever reached its target immediately, and the diffusion and drive levers
-were carried to their targets by the secant updates over the following iterations, with the model
-re-equilibrating between each. This retune used the composable persistent (`*_factor_ps`) and
-direct-setter levers, so the adjustments stacked on the loaded patient's state rather than replacing
-it — the property that lets the live path resume the running simulation from the new operating point.
+The heart-rate set-point lever reached its target immediately; the diffusion and drive levers were
+carried to theirs by the secant updates over the following iterations, the model re-equilibrating
+between each. This retune used the composable persistent (`*_factor_ps`) and direct-setter levers, so
+the adjustments stacked on the loaded patient's state rather than replacing it — the property that lets
+the live path resume from the new operating point.
 
-The live MAP lever is bidirectional: because it drives systemic resistance through the persistent
-vessel layer (which composes with, rather than being overwritten by, the model's humoral and
-autonomic contributions to the same layer) and simultaneously aligns the baroreflex set-point to the
-target (Section 2.4.4), a live tune converges whether MAP must rise or fall — for example a lone
-target of 72 mmHg converged in one iteration and a target of 50 mmHg (below the baseline of 59 mmHg)
-in two, and a feasible joint MAP + cardiac-output tune converged in two iterations.
+The live MAP lever is bidirectional: it drives systemic resistance through the persistent vessel layer
+(which composes with, rather than overwrites, the model's humoral and autonomic contributions) and
+simultaneously aligns the baroreflex set-point to the target (Section 2.4.4), so a live tune converges
+whether MAP must rise or fall — a lone target of 72 mmHg converged in one iteration, 50 mmHg (below the
+59 mmHg baseline) in two, and a feasible joint MAP + cardiac-output tune in two.
 
-**On coupled and infeasible targets.** Not every target combination converges, and the calibrator
-reports rather than masks this (Section 4.3). The clearest case is physiological infeasibility: when
-cardiac output is targeted well above baseline through the contractility lever alone, it plateaus
-below the target, because raising contractility raises afterload and cardiac output is ultimately
-preload-limited — a single contractility lever cannot drive output to an arbitrary value. More
-generally, because the levers interact through the shared circulation (systemic resistance affects
-both MAP and, through afterload, cardiac output; contractility affects both cardiac output and MAP), a
-pair of strongly coupled targets can make the decoupled per-lever secant oscillate rather than
-converge. These are limitations of infeasible or strongly coupled targets, not of the calibration
-loop itself; the sensitivity analysis of Section 3.3 quantifies exactly which targets are coupled, and
-the joint-optimization extension is discussed in Section 4.4.
+**On coupled and infeasible targets.** Not every combination converges, and the calibrator reports
+rather than masks this (Section 4.3). The clearest case is infeasibility: cardiac output targeted well
+above baseline through the contractility lever alone plateaus below target, because raising
+contractility raises afterload and output is ultimately preload-limited. More generally, because the
+levers interact through the shared circulation, a pair of strongly coupled targets can make the
+decoupled per-lever secant oscillate rather than converge. These are limitations of infeasible or
+strongly coupled targets, not of the loop itself; Section 3.3 quantifies which targets are coupled and
+Section 4.4 discusses the joint-optimization extension.
 
 ### 3.3 The one-lever design is sensitivity-validated
 
@@ -450,32 +422,29 @@ in fact carries the largest Sᵢ, and the designated lever's partial rank correl
 † S_Tᵢ slightly exceeds 1 for heart rate, base excess and pH — a known finite-N behaviour of the
 Jansen total-index estimator that flags heavy interaction, not a computational error.
 
-Three readings follow, and they matter for how the calibrator should be used. **The three mechanical
-pressure/volume targets pass cleanly.** For mean arterial, mean pulmonary and central venous pressure
-the designated lever is simultaneously the largest first-order index (Sᵢ 0.56, 0.67, 0.67) and the
-dominant, correctly-signed partial correlation (PRCC 0.89, 0.91, −0.80), with modest interaction
-budgets — the operational definition of a good calibration lever. (These are exactly the three targets
-that in a population decomposition read as "dominated by weight"; conditioning on the patient's known
-birth weight reveals the single-lever structure that population variance had masked — the reason
-weight is treated as fixed context.) **Heart rate and acid–base are dominant but coupled:** their
-designated levers carry the largest or near-largest variance, yet near-unity total indices (up to
-1.12) because the baroreflex and the Stewart strong-ion chemistry make them identifiable as coupled
-blocks rather than orthogonal knobs. **Two designated pairings fail, physiologically:** cardiac output
-is preload- and reflex-governed (its largest influence is venous filling, not contractility, because
-the baroreflex buffers the flow response to a contractility change), and oxygenation is
-*diffusion-inert* at the saturated term baseline — the O₂-diffusing-capacity lever explains
-essentially zero SpO₂ variance (Sᵢ ≈ 0.00) because the patient sits on the flat upper plateau of the
-oxyhaemoglobin dissociation curve. The local Fisher-information matrix is well conditioned (condition
-number ≈ 1.4 × 10³), and its column-pivoted-QR ordering ranks the diffusing-capacity lever **last** —
-the least-identifiable direction — in exact agreement with its near-zero influence.
+Three readings follow. **The three mechanical pressure/volume targets pass cleanly:** for mean
+arterial, mean pulmonary and central venous pressure the designated lever is both the largest
+first-order index (Sᵢ 0.56, 0.67, 0.67) and the dominant, correctly-signed partial correlation (PRCC
+0.89, 0.91, −0.80), with modest interaction — the operational definition of a good calibration lever.
+(These are the three targets a population decomposition reads as "dominated by weight"; conditioning on
+the patient's known birth weight reveals the single-lever structure population variance had masked —
+the reason weight is treated as fixed context.) **Heart rate and acid–base are dominant but coupled:**
+their levers carry the largest or near-largest variance yet near-unity total indices (up to 1.12),
+because the baroreflex and the Stewart strong-ion chemistry make them coupled blocks rather than
+orthogonal knobs. **Two designated pairings fail physiologically:** cardiac output is preload- and
+reflex-governed (its largest influence is venous filling, not contractility, because the baroreflex
+buffers the flow response), and oxygenation is *diffusion-inert* at the saturated term baseline — the
+O₂-diffusing-capacity lever explains essentially zero SpO₂ variance (Sᵢ ≈ 0.00), the patient sitting on
+the flat upper plateau of the oxyhaemoglobin dissociation curve. Consistently, the well-conditioned
+Fisher-information matrix (condition number ≈ 1.4 × 10³) ranks that lever **last** in its
+column-pivoted-QR ordering — the least-identifiable direction.
 
 At the saturated term baseline, then, the O₂-diffusing-capacity lever is inert and the calibrator's
-oxygenation pairing does not hold. How oxygenation is *actually* governed once the modelled patient is
-hypoxaemic — and how the dominant lever shifts with the operating point across the disease library —
-is a property of the integrated model rather than of the calibration method, and is reported in the
-integrated-model paper [P5] (where the same variance-based analysis, extended across the library's
-operating points, shows the oxygenation influence moving to pulmonary vascular resistance and shunt
-geometry). Its consequence for the design of the oxygenation controller is taken up in Section 4.4.
+oxygenation pairing does not hold. How oxygenation is actually governed once the patient is hypoxaemic
+— the dominant influence shifting to pulmonary vascular resistance and shunt geometry as the operating
+point moves across the disease library — is a property of the integrated model, reported with the same
+variance-based analysis in [P5]; its consequence for the oxygenation controller is taken up in
+Section 4.4.
 
 ---
 
@@ -528,24 +497,20 @@ fallback mitigate but do not eliminate.
 
 ### 4.4 Future work
 
-Several extensions follow. The sensitivity analysis of Sections 2.6 and 3.3 identifies, for each
-target, the most informative lever at the calibration baseline; extended across operating points it
-shows the one-lever-per-target assumption to be weakest for oxygenation [P5]. Together these yield one
-concrete, actionable design change: because modelled oxygenation is governed by pulmonary vascular
-resistance and shunt geometry rather than by diffusing capacity wherever the patient is hypoxaemic
-[P5], the SpO₂ controller should be re-based on those resistance/shunt levers, or made
-phenotype-aware, rather than relying on a diffusing-capacity lever that has little traction at any
-operating point tested. Building on that analysis, calibration could be extended from
-the present decoupled scheme to a joint multi-target optimization for the strongly coupled
-configurations where cross-effects dominate (for example by estimating the local multi-input Jacobian
-rather than per-lever slopes); the variance-based Sobol′/PRCC quantification could be completed at the
-disease operating points, currently characterized there by the local screen only; and it could be
-extended to the internal gains of the closed-loop controllers, which the lever-level analysis does not
-reach. On the interpretation side,
-the specifications the language model produces could be validated against a broader range of source
-formats and against inter-rater agreement with clinicians. Finally, prospective validation — fitting
-the model to real patients from their bedside data and testing the fit against subsequently observed
-physiology — would establish the clinical accuracy of the individualized models the pipeline produces.
+Several extensions follow. The sensitivity analysis (Sections 2.6, 3.3) identifies the most
+informative lever per target and, extended across operating points, shows the one-lever assumption
+weakest for oxygenation [P5]; it yields one actionable design change — because modelled oxygenation is
+governed by pulmonary vascular resistance and shunt geometry rather than diffusing capacity wherever
+the patient is hypoxaemic [P5], the SpO₂ controller should be re-based on those resistance/shunt
+levers, or made phenotype-aware. Calibration could also be extended from the present decoupled scheme
+to a joint multi-target optimization for strongly coupled configurations (estimating the local
+multi-input Jacobian rather than per-lever slopes), the Sobol′/PRCC quantification completed at the
+disease operating points (currently the local screen only), and the analysis extended to the
+controllers' internal gains, which the lever-level analysis does not reach. On the interpretation
+side, the language model's specifications could be validated against more source formats and against
+inter-rater agreement with clinicians. Finally, prospective validation — fitting the model to real
+patients and testing the fit against subsequently observed physiology — would establish the clinical
+accuracy of the individualized models.
 
 ---
 
