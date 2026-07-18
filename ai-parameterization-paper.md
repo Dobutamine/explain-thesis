@@ -53,7 +53,7 @@ scenario, target values *x\** for named quantities, optional pathophysiological 
 **Eq. 1** (effective-value composition; see shared Methods S2). Every physical parameter *p* is used
 through an effective value
 
-> *p*_eff = *p* + (*k* − 1)·*p* + (*k*ₚ − 1)·*p* + (*k*ₛ − 1)·*p*
+$$p_{\text{eff}} = p + (k - 1)\,p + (k_p - 1)\,p + (k_s - 1)\,p \tag{1}$$
 
 with a non-persistent layer *k* (transient interventions), a persistent user/scenario layer *k*ₚ, and
 a scaling layer *k*ₛ written only by the allometric scaler. Calibration writes the persistent layer
@@ -91,18 +91,18 @@ The calibrator assigns one controller per target, coupling a lever *l* (written 
 respects Eq. 1) to a measured quantity *x* and updating *l* to drive *x* toward its target *x\**. With
 fewer than two samples the update is a proportional seed,
 
-> **Eq. 2** &nbsp; *l*_{k+1} = clamp( *l*_k + *s*·*g*·(*x\** − *x*_k),  *l*_lo,  *l*_hi )
+$$l_{k+1} = \mathrm{clamp}\!\big(l_k + s\,g\,(x^* - x_k),\ l_{\text{lo}},\ l_{\text{hi}}\big) \tag{2}$$
 
 where *s* = ±1 is the sign of the lever→measurement relationship, *g* a seed gain and [*l*_lo, *l*_hi]
 the lever's physiological bounds. Once two samples (*l*_{k−1}, *x*_{k−1}) and (*l*_k, *x*_k) exist, the
 controller switches to the secant method — a derivative-free root-find estimating the local
 sensitivity from the last two evaluations:
 
-> **Eq. 3** &nbsp; *m*_k = (*x*_k − *x*_{k−1}) / (*l*_k − *l*_{k−1}),  &nbsp; *l*_{k+1} = clamp( *l*_k + (*x\** − *x*_k)/*m*_k,  *l*_lo,  *l*_hi )
+$$m_k = \frac{x_k - x_{k-1}}{l_k - l_{k-1}}, \quad l_{k+1} = \mathrm{clamp}\!\big(l_k + (x^* - x_k)/m_k,\ l_{\text{lo}},\ l_{\text{hi}}\big) \tag{3}$$
 
 A controller reports that it has converged, and makes no move, when its residual is within tolerance:
 
-> **Eq. 4** &nbsp; | *x\** − *x*_k | ≤ τ
+$$|x^* - x_k| \le \tau \tag{4}$$
 
 with τ a per-quantity, clinician-meaningful tolerance band (Table 2). Equations 2–4 are the
 proportional-seed, secant and convergence rules of the shared closed-loop calibrator — a standard
@@ -111,7 +111,7 @@ secant root-finder (see the series' shared Methods [P1]).
 Measured quantities are read as short-window means to suppress the residual pulsatility of the
 beat-averaged monitor:
 
-> **Eq. 5** &nbsp; *x̄* = (1/N)·Σ_{i=1..N} *x*(*t*ᵢ),  &nbsp; N = window / Δt_s
+$$\bar x = \frac{1}{N}\sum_{i=1}^{N} x(t_i), \quad N = \text{window} / \Delta t_s \tag{5}$$
 
 sampled at a sub-cardiac-cycle step Δt_s = 0.02 s over a window of order ten seconds.
 
@@ -178,7 +178,7 @@ Total blood volume is handled by a non-secant controller: because the circulatio
 injected or withdrawn volume and a fraction leaves the stressed compartment, each iteration simply
 rescales every blood compartment's volume by the ratio of target to measured,
 
-> **Eq. 6** &nbsp; *V*_j ← *V*_j · (*x\** / *x̄*),  &nbsp; *V*ᵤ,j ← *V*ᵤ,j · (*x\** / *x̄*)
+$$V_j \leftarrow V_j \cdot (x^* / \bar x), \quad V_{u,j} \leftarrow V_{u,j} \cdot (x^* / \bar x) \tag{6}$$
 
 which converges in one or two iterations.
 

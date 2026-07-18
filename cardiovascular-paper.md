@@ -99,18 +99,18 @@ heart.
 Contractions are simulated via rising heart-chamber elastances, resulting in physiologic pressure
 and flow patterns in the hemodynamics model. The atria are activated by a half-sinusoid over the duration of atrial systole in seconds (*T*_as). This duration is defined by the PQ time in seconds:
 
-> **Eq. 1** &nbsp; *a*_a(*t*) = sin[π·(*t* / *T*_as)]
+$$a_a(t) = \sin[\pi\,(t / T_{\text{as}})] \tag{1}$$
 
 The ventricles and coronary capacitances are activated by a delayed and slightly skewed
 half-sinusoid over the duration of ventricular systole. The elastance waveforms displayed in Figure
 3 have chamber-specific baselines and amplitudes:
 
-> **Eq. 2** &nbsp; *a*_v(*t*) = [(*t* − (*T*_as + *T*_av)) / (*K*_n·*t*_vs(*n*))]·sin[π·((*t* − (*T*_as + *T*_av)) / *t*_vs(*n*))]
+$$a_v(t) = \frac{t - (T_{\text{as}} + T_{\text{av}})}{K_n\,t_{\text{vs}}(n)}\cdot\sin\!\left[\pi\,\frac{t - (T_{\text{as}} + T_{\text{av}})}{t_{\text{vs}}(n)}\right] \tag{2}$$
 
 *K*_n is a normalization constant resulting in a maximum of 1 of the time function. The duration of
 ventricular systole (*t*_vs(*n*)) is calculated by Bazett's formula using the QT interval [15]:
 
-> **Eq. 3** &nbsp; *t*_vs(*n*) = QT·√(60 / hr(*n*))
+$$t_{\text{vs}}(n) = \mathrm{QT}\cdot\sqrt{60 / \mathrm{hr}(n)} \tag{3}$$
 
 **Fig. 3.** Time-varying elastances for the left heart. *(Native chart object in the source
 manuscript `ExplainCircPaper(27012026)_WPdB_TA_WvM.docx`; no raster export is carried in this
@@ -130,34 +130,26 @@ A **resistor** relates the flow rate to the pressure difference across it, with 
 (resistance *R*) and a non-linear term (*K*₁), and separate forward (*R*_f) and reverse (*R*_r)
 resistances:
 
-> **Eq. 4** &nbsp; *p*₁(*t*) − *p*₂(*t*) ≥ 0: &nbsp; *K*₁·*f*(*t*)² + *R*_f·*f*(*t*) = *p*₁(*t*) − *p*₂(*t*)
-> **Eq. 4** &nbsp; *p*₁(*t*) − *p*₂(*t*) < 0: &nbsp; −*K*₁·*f*(*t*)² + *R*_r·*f*(*t*) = *p*₁(*t*) − *p*₂(*t*)
+$$\begin{cases} K_1 f(t)^2 + R_f\,f(t) = p_1(t) - p_2(t), & p_1(t) - p_2(t) \ge 0 \\ -K_1 f(t)^2 + R_r\,f(t) = p_1(t) - p_2(t), & p_1(t) - p_2(t) < 0 \end{cases} \tag{4}$$
 
 A **valve** is a resistor with infinite reverse-flow resistance (*R*_b = ∞), so it passes forward
 flow only:
 
-> **Eq. 5** &nbsp; *p*₁(*t*) − *p*₂(*t*) ≥ 0: &nbsp; *K*₁·*f*(*t*)² + *R*_f·*f*(*t*) = *p*₁(*t*) − *p*₂(*t*)
-> **Eq. 5** &nbsp; *p*₁(*t*) − *p*₂(*t*) < 0: &nbsp; *f*(*t*) = 0 &nbsp; (*R*_b = ∞)
+$$\begin{cases} K_1 f(t)^2 + R_f\,f(t) = p_1(t) - p_2(t), & p_1(t) - p_2(t) \ge 0 \\ f(t) = 0, & p_1(t) - p_2(t) < 0 \ \ (R_b = \infty) \end{cases} \tag{5}$$
 
 A **capacitance** relates volume to transmural pressure through a linear elastance *E*, unstressed
 volume UV, and a non-linear coefficient *K*₂:
 
-> **Eq. 6** &nbsp; *v*(*t*) ≥ UV: &nbsp; *p*₁(*t*) = *K*₂·[*v*(*t*) − UV]² + *E*·[*v*(*t*) − UV] + *p*₂(*t*)
-> **Eq. 6** &nbsp; *v*(*t*) < UV: &nbsp; *p*₁(*t*) = −*K*₂·[*v*(*t*) − UV]² + *E*·[*v*(*t*) − UV] + *p*₂(*t*)
+$$p_1(t) = \begin{cases} K_2[v(t) - \mathrm{UV}]^2 + E[v(t) - \mathrm{UV}] + p_2(t), & v(t) \ge \mathrm{UV} \\ -K_2[v(t) - \mathrm{UV}]^2 + E[v(t) - \mathrm{UV}] + p_2(t), & v(t) < \mathrm{UV} \end{cases} \tag{6}$$
 
 A **container** is a capacitance whose volume is the sum of the volumes of the enclosed compartments, transmitting its recoil pressure back onto them:
 
-> **Eq. 7** &nbsp; *v*(*t*) = Σ *v*_n(*t*)
-> **Eq. 7** &nbsp; *v*(*t*) ≥ UV: &nbsp; *p*₁(*t*) = *K*₂·[*v*(*t*) − UV]² + *E*·[*v*(*t*) − UV] + *p*₂(*t*)
-> **Eq. 7** &nbsp; *v*(*t*) < UV: &nbsp; *p*₁(*t*) = −*K*₂·[*v*(*t*) − UV]² + *E*·[*v*(*t*) − UV] + *p*₂(*t*)
+$$v(t) = \sum v_n(t); \qquad p_1(t) = \begin{cases} K_2[v(t) - \mathrm{UV}]^2 + E[v(t) - \mathrm{UV}] + p_2(t), & v(t) \ge \mathrm{UV} \\ -K_2[v(t) - \mathrm{UV}]^2 + E[v(t) - \mathrm{UV}] + p_2(t), & v(t) < \mathrm{UV} \end{cases} \tag{7}$$
 
 A **time-varying elastance** interpolates, via the chamber activation function *a*(*t*), between an
 end-diastolic pressure *p*_ed (a capacitance with minimum elastance E_min) and a maximum-systolic pressure *p*_ms (a linear elastance e_max(*n*)):
 
-> **Eq. 8** &nbsp; *v*(*t*) ≥ UV: &nbsp; *p*_ed(*t*) = *K*₂·[*v*(*t*) − UV]² + *E*_min·[*v*(*t*) − UV]
-> **Eq. 8** &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *p*_ms(*t*) = *e*_max(*n*)·[*v*(*t*) − UV]
-> **Eq. 8** &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *p*₁(*t*) = [*p*_ms(*t*) − *p*_ed(*t*)]·*a*(*t*) + *p*_ed(*t*) + *p*₂(*t*)
-> **Eq. 8** &nbsp; *v*(*t*) < UV: &nbsp; *p*₁(*t*) = *p*₂(*t*)
+$$\begin{aligned} v(t) \ge \mathrm{UV}: \quad & p_{\text{ed}}(t) = K_2[v(t) - \mathrm{UV}]^2 + E_{\min}[v(t) - \mathrm{UV}] \\ & p_{\text{ms}}(t) = e_{\max}(n)[v(t) - \mathrm{UV}] \\ & p_1(t) = [p_{\text{ms}}(t) - p_{\text{ed}}(t)]\,a(t) + p_{\text{ed}}(t) + p_2(t) \\ v(t) < \mathrm{UV}: \quad & p_1(t) = p_2(t) \end{aligned} \tag{8}$$
 
 **Table 1. Fluid-circuit elements.** Each element's constitutive law is the equation cited. Volume
 *v*(*t*), pressure *p*(*t*), and flow rate *f*(*t*). Units: volumes (*v*, UV) in L, elastances
@@ -185,9 +177,7 @@ afferent activation, the sympatho-vagal balance (SVB), and the efferent control 
 **Afferent receptor activation function.** Receptor activation is modeled as an activation function
 centered around the setpoint of the controlled variable *cv*, where af_cv = 0 at *cv* = CV_sp:
 
-> **Eq. 9** &nbsp; *cv* ≥ CV_max: &nbsp; af = CV_max − CV_sp
-> **Eq. 9** &nbsp; CV_min < *cv* < CV_max: &nbsp; af = *cv* − CV_sp
-> **Eq. 9** &nbsp; *cv* ≤ CV_min: &nbsp; af = CV_min − CV_sp
+$$\mathrm{af} = \begin{cases} \mathrm{CV_{max}} - \mathrm{CV_{sp}}, & cv \ge \mathrm{CV_{max}} \\ cv - \mathrm{CV_{sp}}, & \mathrm{CV_{min}} < cv < \mathrm{CV_{max}} \\ \mathrm{CV_{min}} - \mathrm{CV_{sp}}, & cv \le \mathrm{CV_{min}} \end{cases} \tag{9}$$
 
 where af is the receptor activation, CV_sp the setpoint of the controlled variable, and CV_max /
 CV_min its maximum and minimum values. To represent the finite adaptation time of the receptor, the activation is low-pass-filtered using a discrete-time first-order filter with receptor time constant τ_cv, resulting in a filtered activation *a*.
@@ -198,14 +188,14 @@ minimum and maximum activation levels for controlled-variable values below CV_mi
 
 The sympatho-vagal balance is:
 
-> **Eq. 10** &nbsp; svb(*t*) = *G*_(svb/map)·*a*
+$$\mathrm{svb}(t) = G_{(\mathrm{svb/map})}\cdot a \tag{10}$$
 
 where *G*_(svb/map) defines the contribution of mean arterial pressure to the autonomic output.
 
 **Efferent control of cardiovascular effectors.** Each effector is modulated as a relative change
 from its baseline reference value, scaled by its sensitivity to SVB:
 
-> **Eq. 11** &nbsp; ef(svb) = (1 + *G*_(ef/svb)·svb(*t*))·ef_ref
+$$\mathrm{ef}(\mathrm{svb}) = (1 + G_{(\mathrm{ef/svb})}\cdot \mathrm{svb}(t))\cdot \mathrm{ef_{ref}} \tag{11}$$
 
 where *G*_(ef/svb) is the gain relating SVB to the specific effector, and ef_ref is its reference
 value.
@@ -275,7 +265,7 @@ One of the target clinical scenarios is a persistent patent ductus arteriosus (P
 ventricular output (LVO), right ventricular output (RVO), superior vena cava flow (SVCF), and the
 LVO/RVO ratio. The baseline premature-infant configuration reported by Bischoff et al. was produced with the AI-assisted calibration pipeline (Supplementary Methods S1): blood volumes, unstressed volumes, elastances and resistances were first scaled allometrically to the reported weight, after which the calibrator fitted the model to the reported baseline hemodynamic targets. A bidirectional shunt (≥10% right-to- left time) was obtained by modifying pulmonary vascular resistance and elastance at a ductus diameter of 2.2 mm. A hemodynamically significant left-to-right shunt (100% left-to-right) was created by lowering pulmonary vascular resistance to achieve an LVO/RVO ratio of 1.55. Simulations used active circulatory control, a small foramen ovale, and end-expiratory conditions at −3.5 mmHg intrathoracic pressure. For a more qualitative validation of model waveform output, Doppler flow-velocity target data for non-restrictive and restrictive left-to-right transductal blood flow, and for bidirectional transductal blood flow, were obtained from van Laere et al. [22]. The simulated instantaneous PDA flow rate *f*_DA(*t*) in L·s⁻¹ (Fig. 2) is transformed into a Doppler flow pattern with a velocity *v*_DA(*t*) in m·s⁻¹, averaged over the ductus velocity profile:
 
-> **Eq. 12** &nbsp; *v*_DA(*t*) = 1000·*f*_DA(*t*) / (π·(*D*_PDA / 2)²)
+$$v_{\mathrm{DA}}(t) = \frac{1000\,f_{\mathrm{DA}}(t)}{\pi\,(D_{\mathrm{PDA}} / 2)^2} \tag{12}$$
 
 *Source: `explain/component_models/Pda.js`.*
 

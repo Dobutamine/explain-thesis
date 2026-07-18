@@ -71,7 +71,7 @@ clearance in a failing lung as a function of their clinical controls (Section 3)
 Notation and units follow the series convention (respiratory paper §S1). Ventilator pressures are
 given in the clinical unit cmH₂O and converted to the engine's mmHg by
 
-> **Eq. 1** &nbsp; *P*[mmHg] = *P*[cmH₂O] / 1.35951
+$$P\,[\mathrm{mmHg}] = P\,[\mathrm{cmH_2O}] / 1.35951 \tag{1}$$
 
 Throughout, Δt is the integration step and *x* ← *x* + (…)·Δt denotes forward-Euler integration. The
 gas compartments, valves (directional resistors), gas composition and the alveolar gas exchange that
@@ -93,7 +93,7 @@ intubates the patient; the alveolar gas exchange downstream is unchanged (respir
 **Endotracheal-tube resistance.** The tube is a resistor whose resistance rises with gas flow and
 falls with bore, following a diameter- and length-dependent law [1,2]:
 
-> **Eq. 2** &nbsp; *R*_ETT = max( 15,  (*a*·*f* + *b*)·(*L*/*L*_ref) ),  &nbsp; *a* = −2.375·*d* + 11.9375,  *b* = −14.375·*d* + 65.9374
+$$R_{\mathrm{ETT}} = \max\!\big(15,\, (a\,f + b)(L/L_{\text{ref}})\big), \quad a = -2.375\,d + 11.9375, \quad b = -14.375\,d + 65.9374 \tag{2}$$
 
 with *d* the internal diameter (mm), *L* the length (mm, reference *L*_ref = 110), *f* the gas flow,
 and a floor of 15 (mmHg·s·L⁻¹). The flow-dependent term makes the tube a Rohrer-type (non-ohmic)
@@ -103,27 +103,27 @@ resistance; the coefficients *a*, *b* decrease with diameter, so a wider tube of
 valve is closed and the inspiratory valve is opened with a resistance set so that the delivered flow
 drives the circuit toward the target peak inspiratory pressure (PIP):
 
-> **Eq. 3** &nbsp; *R*_insp = (*P*_gasin + PIP − *P*_atm − PEEP) / (*Q*_insp/60)
+$$R_{\text{insp}} = \frac{P_{\text{gasin}} + \mathrm{PIP} - P_{\text{atm}} - \mathrm{PEEP}}{Q_{\text{insp}}/60} \tag{3}$$
 
 (with *Q*_insp the set inspiratory flow, L·min⁻¹); the inspiratory valve is shut once the circuit
 pressure reaches PIP, so the breath is pressure-limited. In expiration the expiratory valve opens and
 the expiratory reservoir volume is pinned so that the circuit floats at PEEP,
 
-> **Eq. 4** &nbsp; *V*_gasout = PEEP / *E*_base + *V*ᵤ
+$$V_{\text{gasout}} = \frac{\mathrm{PEEP}}{E_{\text{base}}} + V_u \tag{4}$$
 
 Breaths are time-cycled: the expiratory time follows from the set rate and inspiratory time,
 
-> **Eq. 5** &nbsp; *T*_exp = 60/RR − *T*_insp
+$$T_{\text{exp}} = 60/\mathrm{RR} - T_{\text{insp}} \tag{5}$$
 
 and inspiration and expiration alternate as their timers elapse. At end-expiration the dynamic
 compliance is measured from the achieved tidal volume and the driving pressure,
 
-> **Eq. 6** &nbsp; *C*_dyn = *V*_T / (PIP − PEEP)  &nbsp;[mL·cmH₂O⁻¹]
+$$C_{\text{dyn}} = \frac{V_T}{\mathrm{PIP} - \mathrm{PEEP}}\ \ [\mathrm{mL\,cmH_2O^{-1}}] \tag{6}$$
 
 In pressure-regulated volume control the peak pressure is adjusted breath-to-breath by a servo that
 drives the measured expiratory tidal volume to the set target *V*_T\*, within bounds:
 
-> **Eq. 7** &nbsp; PIP ← PIP ± 1 cmH₂O per breath,  clamped to [PEEP + 2, PIP_max],  toward *V*_T = *V*_T\*
+$$\mathrm{PIP} \leftarrow \mathrm{PIP} \pm 1\ \mathrm{cmH_2O}\ \text{per breath, clamped to } [\mathrm{PEEP} + 2,\, \mathrm{PIP_{max}}], \text{ toward } V_T = V_T^* \tag{7}$$
 
 so PRVC delivers a targeted volume at the lowest sufficient pressure — the volume-targeting behaviour
 of the clinical mode [3,4].
@@ -132,7 +132,7 @@ of the clinical mode [3,4].
 inspiration continues while the endotracheal-tube flow rises, and the ventilator cycles to expiration
 when the flow falls below a fraction of its peak,
 
-> **Eq. 8** &nbsp; cycle to expiration when *f*_ETT < 0.3·*f*_peak
+$$\text{cycle to expiration when } f_{\mathrm{ETT}} < 0.3\,f_{\text{peak}} \tag{8}$$
 
 reproducing the flow-termination criterion of clinical pressure support.
 
@@ -141,14 +141,14 @@ CPAP level (= PEEP); the patient breathes spontaneously through the endotracheal
 paper, the spontaneous-drive model). With spontaneous breathing off, CPAP holds airway pressure but
 delivers no tidal volume, as in reality. The reported minute ventilation is the patient's own:
 
-> **Eq. 9** &nbsp; *V̇*_E = *V*_T · RR_spont
+$$\dot V_E = V_T \cdot \mathrm{RR_{spont}} \tag{9}$$
 
 **Patient triggering (synchronized ventilation).** When synchronized, a mechanical breath is triggered
 by the patient's own inspiratory effort: the tube flow drawn during a spontaneous inspiration is
 integrated, and a breath is delivered once it exceeds a trigger volume set as a fraction of the tidal
 volume,
 
-> **Eq. 10** &nbsp; trigger when ∫ *f*_ETT d*t* > *V*_trig = *V*_T · (trigger% / 100)
+$$\text{trigger when } \int f_{\mathrm{ETT}}\,\mathrm{d}t > V_{\text{trig}} = V_T \cdot (\text{trigger}\%/100) \tag{10}$$
 
 so that assisted breaths are phase-locked to the patient's drive. This coupling to the spontaneous
 respiratory model (which reads the active airway inlet, whether the natural mouth or the endotracheal
@@ -180,7 +180,7 @@ return the aortic root; VV: drain and return on the venous side); there is no se
 pressure on the node it drives (the downstream node for a centrifugal pump, the upstream node for a
 roller pump):
 
-> **Eq. 11** &nbsp; *p*_pump = −RPM / 25  &nbsp;[mmHg]
+$$p_{\text{pump}} = -\mathrm{RPM}/25\ \ [\mathrm{mmHg}] \tag{11}$$
 
 (so 1500 rpm ≈ −60 mmHg). This is a deliberate surrogate rather than a physical centrifugal head–flow
 curve. Every circuit segment is a resistor with a prescribed resistance (the cannulae use measured
@@ -188,7 +188,7 @@ resistances from a library of real devices — e.g. Bio-Medicus and Medtronic ar
 of stated French size — scaled by a per-segment multiplier), so the circuit flow through each segment
 is linear in its pressure drop:
 
-> **Eq. 12** &nbsp; *Q*_i = Δ*p*_i / *R*_i,  &nbsp; *R*_i = *R*_{0,i}·*k*_i
+$$Q_i = \Delta p_i / R_i, \quad R_i = R_{0,i}\,k_i \tag{12}$$
 
 with *R*_{0,i} the base/library resistance and *k*_i the segment's resistance factor; the pump head of
 Eq. 11 sets the pressure drop across the driven segment. The reported circuit flow is the return-cannula
@@ -198,7 +198,7 @@ flow, 60·*Q*_return (L·min⁻¹).
 Fick flux as the native alveolar–capillary barrier (respiratory paper, Eqs. 13–14), applied between the
 oxygenator's blood compartment and its sweep-gas compartment:
 
-> **Eq. 13** &nbsp; Φ_X = (*P*_X,blood − *P*_X,gas)·*D*_X·Δt  &nbsp;(X ∈ {O₂, CO₂})
+$$\Phi_X = (P_{X,\text{blood}} - P_{X,\text{gas}})\,D_X\,\Delta t \qquad (X \in \{\mathrm{O_2}, \mathrm{CO_2}\}) \tag{13}$$
 
 with membrane diffusion constants *D*_O₂ and *D*_CO₂; because the sweep gas is oxygen-rich and
 carbon-dioxide-free, the gradients drive O₂ into the blood and CO₂ out. The sweep-gas fraction of
@@ -224,7 +224,7 @@ therefore emergent consequences of the coupled circuit and patient, not prescrib
 weighted set of intrathoracic compartments (heart chambers, great vessels, lungs), following a
 half-rectified sinusoid:
 
-> **Eq. 14** &nbsp; *p*_cc(*t*) = *A*·sin(2π*f*·*t* − π/2) + *A*,  &nbsp; *A* = *p*_max/2,  *f* = *f*_comp/60
+$$p_{\text{cc}}(t) = A\,\sin(2\pi f\,t - \pi/2) + A, \quad A = p_{\text{max}}/2, \quad f = f_{\text{comp}}/60 \tag{14}$$
 
 (so *p*_cc ramps 0 → *p*_max → 0 each compression). The pressure is added to each target compartment's
 external pressure with a per-compartment weight, *p*_ext^(k) ← *p*_ext^(k) + *w*_k·*p*_cc; because the
