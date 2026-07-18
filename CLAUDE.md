@@ -55,7 +55,7 @@ Nine papers in one journal is defensible only because of this. Before adding con
 
 ## Writing conventions
 
-- **Equations** are plain-text Unicode in a blockquote: `> **Eq. 1** &nbsp; *a*_a(*t*) = sin[π·(*t* / *T*_as)]`. Each block names the engine source file it was checked against. All Markdown equations are placeholders to be **re-keyed as native Word OMML at assembly** — do not treat Markdown as the final form.
+- **Equations** are plain-text Unicode in a blockquote: `> **Eq. 1** &nbsp; *a*_a(*t*) = sin[π·(*t* / *T*_as)]`. Each block names the engine source file it was checked against. All Markdown equations are placeholders to be **re-keyed as native Word OMML at assembly** — do not treat Markdown as the final form. **Trial (2026-07-18):** `respiratory-paper.md` (P2) is piloting **LaTeX `$$…$$` math blocks** (with `\tag{N}`) instead, so equations render in the Obsidian vault / on GitHub — do **not** revert P2 to plain-text. The other papers stay plain-text pending evaluation of the pilot; LaTeX→OMML at assembly is straightforward.
 - **References**: Vancouver. `_references.md` is the shared *pool*; each paper renumbers its own subset in citation order. `P1_references_verified.md` is P1's PubMed-verified list (a companion for the Word/EndNote pass — **not auto-injected into the `.docx`**).
 - **`[VERIFY]`** marks an unverified reference. Never invent a PMID/DOI — verify against PubMed and record the confirmed identifier. Some sources are genuinely pre-MEDLINE/textbook and are marked as such; don't chase those in PubMed.
 - **`‹angle-bracket slots›`** are unfilled placeholders awaiting a decision or a DOI.
