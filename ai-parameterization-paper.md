@@ -20,7 +20,7 @@ full treatment.*
 
 **Background:** Lumped-parameter neonatal models are prized for interpretable parameters but are underdetermined — many parameters, few bedside measurements — so individual fitting has required slow, irreproducible hand-tuning, and existing in-silico neonatal models are run with generic parameters.
 
-**Methods:** An AI-assisted closed-loop pipeline parameterizes a real-time whole-body neonatal simulator by separating two roles. An interpretation layer — a large language model (Claude) — reads the clinical description and emits a validated, allowlisted specification (baseline, targets, pathophysiology), never editing equations or state. A deterministic calibrator then assigns one interpretable lever per target and drives each to tolerance with a proportional-seed/secant root-finder, after allometric and gestational-age seeding and baroreflex set-point alignment so the model's control loops defend the fit. One calibrator serves offline construction and live retuning.
+**Methods:** An AI-assisted closed-loop pipeline parameterizes a real-time whole-body neonatal simulator (EXPLAIN) by separating two roles. An interpretation layer — a large language model (Claude) — reads the clinical description and emits a validated, allowlisted specification (baseline, targets, pathophysiology), never editing equations or state. A deterministic calibrator then assigns one interpretable lever per target and drives each to tolerance with a proportional-seed/secant root-finder, after allometric and gestational-age seeding and baroreflex set-point alignment so the model's control loops defend the fit. One calibrator serves offline construction and live retuning.
 
 **Results:** For a 28-week, 1.0-kg preterm construction, five targets (heart rate, mean arterial pressure, cardiac output, SpO₂, PCO₂) converged within tolerance in two iterations, untargeted vitals in preterm ranges; a running simulation retuned in three. A variance-based sensitivity analysis (Sobol′/PRCC, estimator-validated) confirms the one-lever design for the pressure targets and flags where coupling or operating point weakens it.
 
@@ -33,28 +33,13 @@ full treatment.*
 Mechanistic, lumped-parameter models represent the circulation, the respiratory system and their regulation as networks of compartments governed by interpretable physical parameters — elastances, resistances, unstressed volumes, diffusion constants, shunt geometries — each corresponding to a physiological property a clinician can reason about. That interpretability carries a well-known cost. A whole-body neonatal model of the kind described in the companion papers has of order a hundred components and several hundred free parameters, while the clinic supplies only a handful of measured quantities per patient — a heart rate, a mean arterial pressure, a central venous pressure, a cardiac output or its surrogate, an oxygen saturation and a blood gas. Fitting the model to a patient is therefore a severely underdetermined inverse problem: many parameter combinations reproduce the same
 few measurements.
 
-The conventional remedy is expert hand-tuning: a modeller adjusts parameters by trial and error until
-the simulated monitor matches the clinical picture. This works, but it is slow, hard to reproduce and
-audit, and scales poorly — every new patient is a fresh manual fit. Parameterization has thus been a
-persistent barrier to using lumped-parameter models at the bedside, where an individualized model must
-be produced quickly and reliably from the data at hand.
+The conventional remedy is expert hand-tuning: a modeller adjusts parameters by trial and error until the simulated monitor matches the clinical picture. This works, but it is slow, hard to reproduce and audit, and scales poorly — every new patient is a fresh manual fit. Parameterization has thus been a persistent barrier to using lumped-parameter models at the bedside, where an individualized model must be produced quickly and reliably from the data at hand.
 
-The method rests on two observations. First, although the full inverse problem is ill-posed, much of
-the modeller's expertise is a structural fact about the model: for each measured quantity there is
-usually one dominant, monotone parameter — one lever — that is its natural controller, provided the
-lever is chosen to act with, rather than against, the model's own active control loops. That
-observable-to-controllable pairing turns the coupled high-dimensional fit into a set of nearly
-independent one-dimensional root-finding problems, each solvable by a robust, derivative-free method.
-Second, the part that genuinely requires judgement — reading a messy clinical description and deciding
-the targets and pathophysiology — is exactly what a large language model does well, and exactly the
-part that should never touch the model's equations or state directly.
+The method rests on two observations. First, although the full inverse problem is ill-posed, much of the modeller's expertise is a structural fact about the model: for each measured quantity there is usually one dominant, monotone parameter — one lever — that is its natural controller, provided the lever is chosen to act with, rather than against, the model's own active control loops. That observable-to-controllable pairing turns the coupled high-dimensional fit into a set of nearly independent one-dimensional root-finding problems, each solvable by a robust, derivative-free method. Second, the part that genuinely requires judgement — reading a messy clinical description and deciding the targets and pathophysiology — is exactly what a large language model does well, and exactly the part that should never touch the model's equations or state directly.
 
 EXPLAIN accordingly parameterizes a patient with a two-layer pipeline. An interpretation layer (a
-large language model) translates the clinical information into a validated, bounded specification; a
-deterministic calibration layer fits the model to it by a closed-loop, one-lever-per-target
-root-finder. The roles are strictly separated — the language model performs no numerical fitting, the
-calibrator no interpretation — and the same calibrator serves both offline construction of a new
-calibrated patient and live retuning of an already-running simulation.
+large language model) translates the clinical information into a validated, bounded specification; a deterministic calibration layer fits the model to it by a closed-loop, one-lever-per-target
+root-finder. The roles are strictly separated — the language model performs no numerical fitting, the calibrator no interpretation — and the same calibrator serves both offline construction of a new calibrated patient and live retuning of an already-running simulation.
 
 ---
 
@@ -63,15 +48,8 @@ calibrated patient and live retuning of an already-running simulation.
 ### 2.1 Overview
 
 The pipeline has two layers with a single, narrow interface: a **specification** — a baseline
-scenario, target values *x\** for named quantities, optional pathophysiological modifiers, and optional
-per-target tolerances. The **interpretation layer** (a large language model) produces the specification
-from clinical inputs; the **calibration layer** (a deterministic root-finder) consumes it and fits the
-model. Because the interface is an explicit, machine-checkable object rather than a stream of parameter
-writes, the calibrator receives only clean numerical targets and every language-model action is
-validated exactly as a manual edit is (Section 2.3). The composability substrate that makes this
-possible — the three-layer effective-value decomposition of every physical parameter — is shared across
-the series and summarized in Eq. 1.
-
+scenario, target values *x\** for named quantities, optional pathophysiological modifiers, and optional per-target tolerances. The **interpretation layer** (a large language model) produces the specification from clinical inputs; the **calibration layer** (a deterministic root-finder) consumes it and fits the model. Because the interface is an explicit, machine-checkable object rather than a stream of parameter writes, the calibrator receives only clean numerical targets and every language-model action is validated exactly as a manual edit is (Section 2.3). The composability substrate that makes this possible — the three-layer effective-value decomposition of every physical parameter — is shared across the series and summarized in Eq. 1.
+``
 **Eq. 1** (effective-value composition; see shared Methods S2). Every physical parameter *p* is used
 through an effective value
 
@@ -87,8 +65,7 @@ discarding its scaling.
 ### 2.2 Problem statement
 
 Let the model have a parameter vector **p** and let **x**(**p**) be the vector of measured quantities
-the model produces at steady state (mean arterial pressure, cardiac output, and so on). Given a small
-set of target values **x\*** for a subset of these quantities, patient-specific parameterization is
+the model produces at steady state (mean arterial pressure, cardiac output, and so on). Given a small set of target values **x\*** for a subset of these quantities, patient-specific parameterization is
 the inverse problem of finding **p** such that **x**(**p**) = **x\*** to within tolerance. With
 dim(**p**) ≫ dim(**x\***) the problem is underdetermined and, because the compartments interact
 through the shared circulation, the map **x**(**p**) is nonlinear and coupled.
@@ -97,35 +74,14 @@ The method makes the problem tractable by imposing structure a priori. For each 
 *x*ᵢ it designates a single lever *l*ᵢ — one scalar parameter (or a coordinated group of parameters,
 such as left and right ventricular contractility) — chosen so that *x*ᵢ is a dominant, monotone
 function of *l*ᵢ in the operating region, with a known sign *s*ᵢ = ±1 (Table 1). Crucially, the lever
-is chosen to respect the model's active control loops rather than to fight them: for example, arterial
-carbon dioxide is driven by the central ventilatory drive and not by alveolar diffusion, because the
-chemoreflex defends a carbon-dioxide set-point and would otherwise cancel any change made to
-diffusion (Section 2.4.3). With this pairing the inverse problem reduces to a set of one-dimensional
-root-finding problems, *f*ᵢ(*l*ᵢ) = *x*ᵢ(*l*ᵢ) − *x*ᵢ\* = 0, coupled only weakly through the shared
-physiology, which the relaxation loop of Section 2.4.2 resolves.
+is chosen to respect the model's active control loops rather than to fight them: for example, arterial carbon dioxide is driven by the central ventilatory drive and not by alveolar diffusion, because the chemoreflex defends a carbon-dioxide set-point and would otherwise cancel any change made to diffusion (Section 2.4.3). With this pairing the inverse problem reduces to a set of one-dimensional root-finding problems, *f*ᵢ(*l*ᵢ) = *x*ᵢ(*l*ᵢ) − *x*ᵢ\* = 0, coupled only weakly through the shared physiology, which the relaxation loop of Section 2.4.2 resolves.
 
 ### 2.3 Interpretation layer (large language model)
 
-The interpretation layer is a large language model agent (Claude, Anthropic, via the Claude Agent
-SDK). It reads the clinical description — free text, monitor values, or an attached report (PDF or
-CSV) — and produces the specification: a baseline scenario name, target values, named
-pathophysiological modifiers (e.g. a respiratory-distress severity or a pulmonary-vascular-resistance
-scaling), and optional tolerance overrides, as a small JSON object (the `baseline`, `targets`,
-`pathophysiology` and `tolerance` fields of the builder's schema).
+The interpretation layer is a large language model agent (Claude, Anthropic, via the Claude Agent SDK). It reads the clinical description — free text, monitor values, or an attached report (PDF or CSV) — and produces the specification: a baseline scenario name, target values, named
+pathophysiological modifiers (e.g. a respiratory-distress severity or a pulmonary-vascular-resistance scaling), and optional tolerance overrides, as a small JSON object (the `baseline`, `targets`, `pathophysiology` and `tolerance` fields of the builder's schema).
 
-Two properties make this safe to automate. First, every model-facing action the agent emits is drawn
-from a fixed command allowlist and validated before execution against the *same* schema, unit
-conversions and physiological bounds as the interactive parameter editor, so an automated command
-behaves exactly like a vetted manual edit and cannot reach a parameter or value the interface would
-refuse. Second, the two entry points are deliberately coarse and auditable: a **build** command
-carries a full specification and constructs a new calibrated patient offline (a fixed subprocess
-invocation of the builder with the specification on standard input, not a shell string, the baseline
-name validated against a restrictive pattern), and a **tune** command carries live targets and retunes
-the running model (restricted to the canonical live-tunable targets and numeric values, gated to the
-application's full-control scope). The language model never edits an equation, state variable or
-parameter directly — it only emits validated specifications and allowlisted commands; all numerical
-fitting is done by the deterministic layer below (its use as a method component, not an author, is
-disclosed in Section 2.5).
+Two properties make this safe to automate. First, every model-facing action the agent emits is drawn from a fixed command allowlist and validated before execution against the *same* schema, unit conversions and physiological bounds as the interactive parameter editor, so an automated command behaves exactly like a vetted manual edit and cannot reach a parameter or value the interface would refuse. Second, the two entry points are deliberately coarse and auditable: a **build** command carries a full specification and constructs a new calibrated patient offline (a fixed subprocess invocation of the builder with the specification on standard input, not a shell string, the baseline name validated against a restrictive pattern), and a **tune** command carries live targets and retunes the running model (restricted to the canonical live-tunable targets and numeric values, gated to the application's full-control scope). The language model never edits an equation, state variable or parameter directly — it only emits validated specifications and allowlisted commands; all numerical fitting is done by the deterministic layer below (its use as a method component, not an author, is disclosed in Section 2.5).
 
 ### 2.4 Calibration layer (deterministic closed-loop root-finder)
 
@@ -355,12 +311,7 @@ did not push the unspecified quantities out of range.
 
 ### 3.2 Live retuning of a running patient
 
-The same calibrator retunes an already-running simulation in place, composing on top of the loaded
-model without a reload and without resetting its scaling layer (`scripts/probe_tune.mjs`, which
-drives the identical worker-side path). Starting from the running term-neonate baseline (HR 131
-min⁻¹, SpO₂ 97 %, PCO₂ 40 mmHg), a live tune to HR 150 min⁻¹, SpO₂ 92 % and PCO₂ 48 mmHg — a heart
-rate, an oxygenation and a ventilation lever acting on three different subsystems — converged in
-three iterations:
+The same calibrator retunes an already-running simulation in place, composing on top of the loaded model without a reload and without resetting its scaling layer (`scripts/probe_tune.mjs`, which drives the identical worker-side path). Starting from the running term-neonate baseline (HR 131 min⁻¹, SpO₂ 97 %, PCO₂ 40 mmHg), a live tune to HR 150 min⁻¹, SpO₂ 92 % and PCO₂ 48 mmHg — a heart rate, an oxygenation and a ventilation lever acting on three different subsystems — converged in three iterations:
 
 ```
 iter 0:  hr 130.9/150    spo2 96.9/92     pco2 39.8/48
@@ -372,9 +323,7 @@ iter 3:  hr 150.5/150 ✓  spo2 91.7/92 ✓   pco2 50.1/48 ✓
 
 The heart-rate set-point lever reached its target immediately; the diffusion and drive levers were
 carried to theirs by the secant updates over the following iterations, the model re-equilibrating
-between each. This retune used the composable persistent (`*_factor_ps`) and direct-setter levers, so
-the adjustments stacked on the loaded patient's state rather than replacing it — the property that lets
-the live path resume from the new operating point.
+between each. This retune used the composable persistent (`*_factor_ps`) and direct-setter levers, so the adjustments stacked on the loaded patient's state rather than replacing it — the property that lets the live path resume from the new operating point.
 
 The live MAP lever is bidirectional: it drives systemic resistance through the persistent vessel layer
 (which composes with, rather than overwrites, the model's humoral and autonomic contributions) and
@@ -514,16 +463,7 @@ accuracy of the individualized models.
 
 ## Conclusion
 
-Parameterizing a lumped-parameter physiological model for an individual patient has long required slow
-and irreproducible hand-tuning. EXPLAIN replaces this with an AI-assisted, closed-loop pipeline in
-which a large language model interprets the available clinical targets into a validated specification
-and a deterministic calibrator drives the mechanistic model onto those targets by a bank of
-one-dimensional secant root-finders — one physiologically interpretable lever per target, chosen to
-respect the model's own regulation, seeded near the target by allometric and gestational-age scaling.
-By separating interpretation from numerical fitting and confining every automated adjustment to the
-same bounds as a manual edit, the method makes patient-specific instantiation of a mechanistic model
-rapid, auditable and reproducible, and supports both offline construction of new patients and live
-retuning of running simulations.
+Parameterizing a lumped-parameter physiological model for an individual patient has long required slow and irreproducible hand-tuning. EXPLAIN replaces this with an AI-assisted, closed-loop pipeline in which a large language model interprets the available clinical targets into a validated specification and a deterministic calibrator drives the mechanistic model onto those targets by a bank of one-dimensional secant root-finders — one physiologically interpretable lever per target, chosen to respect the model's own regulation, seeded near the target by allometric and gestational-age scaling. By separating interpretation from numerical fitting and confining every automated adjustment to the same bounds as a manual edit, the method makes patient-specific instantiation of a mechanistic model rapid, auditable and reproducible, and supports both offline construction of new patients and live retuning of running simulations.
 
 ---
 
