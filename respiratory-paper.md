@@ -1,4 +1,4 @@
-# An integrated model for simulation of neonatal physiology — THE respiratory system, gas exchange and metabolism
+# An integrated model for simulation of neonatal physiology — The respiratory system, gas exchange and metabolism
 
 *Companion to the cardiovascular paper (Antonius TAJ, van Meurs WL, Westerhof BE, de Boode WP).
 Target journal: Pediatric Research. Markdown working draft — equations to be re-keyed as native
@@ -13,13 +13,13 @@ value until its probe has produced it.*
 
 *(Structured abstract — Pediatric Research Basic Science format. The prior long-form draft is superseded.)*
 
-**Background:** Respiratory care of the newborn requires inferring a tightly coupled system — alveolar ventilation, inspired oxygen, the diffusing capacity of an immature lung, perfusion, metabolism and buffering — from few monitored outputs. Real-time models can make these couplings explicit.
+**Background:** Caring for a sick newborn's breathing means reasoning about a tightly linked system — ventilation, inspired oxygen, an immature lung's oxygen uptake, blood flow, tissue oxygen use and acid–base balance — from few bedside measurements. A real-time model can make these links visible.
 
-**Methods:** We describe the respiratory subsystem of EXPLAIN, an integrated neonatal simulator: elastic gas compartments and thoracic mechanics, a spontaneous respiratory drive, partial-pressure-driven alveolar gas exchange, a physicochemical (Stewart strong-ion) acid–base and oxygen-transport solver, whole-body metabolism with hypoxia-driven lactate, and a dynamic surfactant/alveolar-recruitment model, all solved together on the blood substrate shared with the circulation; patient-specific parameters are set by an AI-assisted closed-loop calibration pipeline.
+**Methods:** We describe the respiratory part of EXPLAIN, an integrated neonatal simulator: the lungs and chest-wall mechanics, spontaneous breathing, alveolar oxygen and carbon-dioxide exchange, blood-gas transport and acid–base chemistry, tissue metabolism with lactate, and surfactant-dependent lung recruitment — all computed in the same blood as the circulation. Rather than hand-tuning, an AI-assisted calibration fits the model to each patient's measured values.
 
-**Results:** The model reproduces a normal term-neonate blood gas within reference ranges; arterial oxygenation rises with inspired oxygen and alveolar diffusion while carbon dioxide tracks ventilatory drive; added unmeasured anions produce a graded metabolic acidosis separated from the respiratory axis; and surfactant in preterm respiratory distress recruits the lung over minutes, raising PaO₂ from 55 to 74 mmHg and SpO₂ from 91 to 96%.
+**Results:** The model reproduces a normal term newborn's blood gas within reference ranges: oxygenation rises with inspired oxygen and lung oxygen uptake, carbon dioxide follows breathing effort, and adding acid produces a metabolic acidosis independent of respiratory changes. In simulated preterm respiratory distress, surfactant recruits the lung over minutes, raising PaO₂ from 55 to 74 mmHg and SpO₂ from 91 to 96%.
 
-**Conclusion:** Solving ventilation, gas exchange, transport, acid–base and metabolism together makes the arterial blood gas an emergent, patient-specific property, providing a transparent real-time platform for neonatal respiratory physiology.
+**Conclusion:** Solving breathing, gas exchange, transport, acid–base and metabolism together makes the arterial blood gas an emergent, patient-specific result, not a preset number — a transparent, real-time platform for neonatal respiratory physiology.
 
 ---
 
@@ -38,7 +38,7 @@ integration particular clinical weight. Surfactant deficiency stiffens the lung,
 functional residual capacity and opens intrapulmonary shunts, so that respiratory distress syndrome presents as a coupled failure of compliance, oxygenation and carbon-dioxide clearance that responds, over minutes, to surfactant replacement and to recruiting pressure. Fetal haemoglobin shifts the oxygen–dissociation curve; permissive hypercapnia and the narrow buffering margins of the immature kidney shape acid–base management; and metabolic rate, thermoregulation and lactate production couple the respiratory state to the whole-body oxygen economy. A model intended to teach or to investigate neonatal respiratory care must therefore represent gas exchange, blood-gas transport, acid–base chemistry, metabolism and surfactant-dependent lung mechanics as one system.
 
 The primary contribution of this paper is a compact but complete mathematical description of that system: a set of governing equations, each with physiologically interpretable parameters, for
-neonatal ventilation, alveolar gas exchange, physicochemical (strong-ion) blood-gas and acid–base transport, oxygen consumption and carbon-dioxide production, hypoxia-driven lactate metabolism, and dynamic surfactant-dependent alveolar recruitment — integrated into a single model that runs in real time in a standard web browser and shares its blood substrate with the circulation. A second, cross-cutting contribution of the EXPLAIN series is the method by which the model is fitted to an individual patient. Rather than tuning parameters by hand — the traditional bottleneck of lumped-parameter modelling — EXPLAIN is parameterized by an AI-assisted, closed-loop calibration pipeline in which a large language model interprets the available clinical targets and a deterministic calibrator drives the mechanistic model onto them to within clinician-meaningful tolerances. For the respiratory system the relevant targets are the arterial oxygen tension and saturation, the carbon-dioxide tension, the pH and the base excess; the method is summarized in Section 2.4 and described in full in the companion parameterization paper [P6]. Below we specify the respiratory model (Section 2), and demonstrate that it reproduces the expected quantitative behaviour of neonatal gas exchange and acid–base physiology (Section 3).
+neonatal ventilation, alveolar gas exchange, physicochemical (strong-ion) blood-gas and acid–base transport, oxygen consumption and carbon-dioxide production, hypoxia-driven lactate metabolism, and dynamic surfactant-dependent alveolar recruitment — integrated into a single model that runs in real time in a standard web browser and is solved in the same blood compartments as the circulation. The plasma acid–base solver at its core we published separately [4]; the contribution here is its integration with gas exchange, oxygen transport, metabolism and surfactant mechanics into one real-time model. A second, cross-cutting contribution of the EXPLAIN series is the method by which the model is fitted to an individual patient. Rather than tuning parameters by hand — the traditional bottleneck of lumped-parameter modelling — EXPLAIN is parameterized by an AI-assisted, closed-loop calibration pipeline in which a large language model interprets the available clinical targets and a deterministic calibrator drives the mechanistic model onto them to within clinician-meaningful tolerances. For the respiratory system the relevant targets are the arterial oxygen tension and saturation, the carbon-dioxide tension, the pH and the base excess; the method is summarized in Section 2.4 and described in full in the companion parameterization paper [P6]. Below we specify the respiratory model (Section 2), and demonstrate that it reproduces the expected quantitative behaviour of neonatal gas exchange and acid–base physiology (Section 3).
 
 ---
 ## 2. Methods
@@ -185,11 +185,12 @@ The alveolar O₂ diffusion constant `dif_o2` is the primary calibration lever f
 #### 2.2.4 Blood-gas transport and acid–base chemistry (keystone)
 
 *Source: `explain/component_models/BloodComposition.js`. This solver is shared with the
-circulation (companion cardiovascular paper) and every organ that carries blood; it is derived in
-full here.*
+circulation (companion cardiovascular paper) and every organ that carries blood. Its plasma
+CO₂/pH/bicarbonate core is the white-box Stewart model we published previously [4]; it is summarized
+here and extended with oxygen transport and a Haldane saturation–CO₂ coupling.*
 
 Blood carries oxygen and carbon dioxide as total contents *t*O₂ and *t*CO₂ (mmol·L⁻¹) and a set of
-plasma strong ions and buffers. The solver converts these, at the compartment temperature *T* and haemoglobin concentration, into pH, PCO₂, bicarbonate, base excess, PO₂ and haemoglobin saturation. It follows the Stewart physicochemical approach [4,5]: the independent variables are the strong-ion difference, the total CO₂, the total weak-acid buffers and the total O₂; the dependent variables (pH, PCO₂, PO₂, SO₂) are found by imposing chemical equilibrium and electroneutrality.
+plasma strong ions and buffers. The solver converts these, at the compartment temperature *T* and haemoglobin concentration, into pH, PCO₂, bicarbonate, base excess, PO₂ and haemoglobin saturation. It follows the Stewart physicochemical approach [5,6]: the independent variables are the strong-ion difference, the total CO₂, the total weak-acid buffers and the total O₂; the dependent variables (pH, PCO₂, PO₂, SO₂) are found by imposing chemical equilibrium and electroneutrality.
 
 **Strong-ion difference.** The apparent strong-ion difference is
 
@@ -198,44 +199,35 @@ plasma strong ions and buffers. The solver converts these, at the compartment te
 so lactate enters directly as a strong anion — the coupling exploited by the metabolic-acidosis
 model (Section 2.2.5).
 
-**CO₂ speciation and buffering.** For a trial hydrogen-ion concentration [H⁺], dissolved CO₂ is
-partitioned among CO₂(aq), bicarbonate and carbonate, with an additional Haldane term [6] by which a lower haemoglobin saturation raises CO₂-carrying capacity:
-
-> **Eq. 16** &nbsp; [CO₂(aq)] = *t*CO₂ / (1 + *K*_c/[H⁺] + *K*_c*K*_d/[H⁺]² + λ·(1 − S_O₂,prev))
-
-> **Eq. 17** &nbsp; [HCO₃⁻] = *K*_c·[CO₂(aq)]/[H⁺],  [CO₃²⁻] = *K*_d·[HCO₃⁻]/[H⁺],  [OH⁻] = *K*_w/[H⁺],  PCO₂ = [CO₂(aq)]/α_CO₂
-
-with dissociation constants *K*_w = 2.5119×10⁻¹¹, *K*_c = 7.943×10⁻⁴, *K*_d = 6.026×10⁻⁸, CO₂
-solubility α_CO₂ = 0.03067 mmol·L⁻¹·mmHg⁻¹, Haldane coefficient λ (default 1.0) and S_O₂,prev the saturation from the previous step (used to break the O₂↔CO₂ circular dependence; at steady state it equals the current saturation). Non-bicarbonate buffering by albumin and phosphate contributes a pH-dependent charge [7]:
-
-> **Eq. 18** &nbsp; *A*⁻ = [albumin]·(0.123·pH − 0.631) + [phosphate]·(0.309·pH − 0.469)
+**CO₂ speciation and buffering.** For a trial [H⁺], total CO₂ is partitioned among dissolved CO₂,
+bicarbonate and carbonate, and buffered by albumin and phosphate (their pH-dependent weak-acid charge *A*⁻ [8]), exactly as in the published solver [4] — extended here with a **Haldane** term (coefficient λ, default 1.0) by which lower haemoglobin saturation raises CO₂-carrying capacity, using the previous step's saturation to break the O₂↔CO₂ circular dependence [7]. Carbon-dioxide tension follows from the dissolved CO₂ and its solubility.
 
 **Electroneutrality.** pH is found as the [H⁺] that makes plasma electrically neutral:
 
-> **Eq. 19** &nbsp; *g*([H⁺]) = [H⁺] + SID − [HCO₃⁻] − 2[CO₃²⁻] − [OH⁻] − *A*⁻ − [UMA] = 0
+> **Eq. 16** &nbsp; *g*([H⁺]) = [H⁺] + SID − [HCO₃⁻] − 2[CO₃²⁻] − [OH⁻] − *A*⁻ − [UMA] = 0
 
-where UMA is the concentration of unmeasured/unidentified strong anions — the calibration lever for base excess and pH (Section 2.4). Equation 19 is solved by a bounded Brent root-finder over [H⁺] (≤ 60 iterations, tolerance 10⁻⁶), with the search interval seeded from the previous step's pH ±0.1 for speed and robustness. From the converged solution the base excess is computed by the Van Slyke expression [8]
+where UMA is the concentration of unmeasured/unidentified strong anions — the calibration lever for base excess and pH (Section 2.4). The dissociation constants, the bounded [H⁺] root-finder and the solver's verification against 1864 neonatal blood-gas samples are given in the published paper [4]. From the converged solution the base excess is computed by the Van Slyke expression [9]
 
-> **Eq. 20** &nbsp; BE = ([HCO₃⁻] − 25.1 + (2.3·Hb + 7.7)·(pH − 7.4))·(1 − 0.023·Hb)
+> **Eq. 17** &nbsp; BE = ([HCO₃⁻] − 25.1 + (2.3·Hb + 7.7)·(pH − 7.4))·(1 − 0.023·Hb)
 
 (Hb in mmol·L⁻¹).
 
-**Oxygen transport.** The oxygen–haemoglobin dissociation curve is a Hill relation [9] whose half-
-saturation tension P₅₀ shifts with pH (Bohr effect), PCO₂, temperature and 2,3-DPG [6]:
+**Oxygen transport.** The oxygen–haemoglobin dissociation curve is a Hill relation [10] whose half-
+saturation tension P₅₀ shifts with pH (Bohr effect), PCO₂, temperature and 2,3-DPG [7]:
 
-> **Eq. 21** &nbsp; log₁₀ P₅₀ = log₁₀ P₅₀,₀ − 0.48·ΔpH + 0.0015·ΔPCO₂ + 0.024·Δ*T* + 0.051·ΔDPG
+> **Eq. 18** &nbsp; log₁₀ P₅₀ = log₁₀ P₅₀,₀ − 0.48·ΔpH + 0.0015·ΔPCO₂ + 0.024·Δ*T* + 0.051·ΔDPG
 
-> **Eq. 22** &nbsp; S_O₂ = *P*_O₂ⁿ / (*P*_O₂ⁿ + P₅₀ⁿ),  &nbsp; *n* = 2.7
+> **Eq. 19** &nbsp; S_O₂ = *P*_O₂ⁿ / (*P*_O₂ⁿ + P₅₀ⁿ),  &nbsp; *n* = 2.7
 
 where ΔpH = pH − 7.40, ΔPCO₂ = PCO₂ − 40, Δ*T* = *T* − 37, ΔDPG = DPG − 5, and P₅₀,₀ is the
 compartment's intrinsic O₂-haemoglobin affinity baseline (fetal haemoglobin 18.8, neonatal 20.0,
 adult 26.7 mmHg — the mechanism by which fetal blood's higher affinity is represented). Total
 oxygen content combines dissolved and haemoglobin-bound O₂,
 
-> **Eq. 23** &nbsp; *t*O₂ = (0.0031·*P*_O₂ + 1.36·Hb_gdl·S_O₂)·10·(760/(*R*·(273.15+*T*)))
+> **Eq. 20** &nbsp; *t*O₂ = (0.0031·*P*_O₂ + 1.36·Hb_gdl·S_O₂)·10·(760/(*R*·(273.15+*T*)))
 
 with Hb_gdl = Hb/0.6206 the haemoglobin in g·dL⁻¹. For known *t*O₂ the arterial *P*_O₂ (and hence
-S_O₂) is found by a second Brent root-find of Eq. 23, seeded from the previous *P*_O₂ ±10 mmHg.
+S_O₂) is found by a second Brent root-find of Eq. 20, seeded from the previous *P*_O₂ ±10 mmHg.
 
 This single solver is what makes gas transport a whole-body property: the same equations run in the pulmonary capillaries (loading O₂, unloading CO₂), in the systemic tissues (the reverse), and in every monitored blood compartment, so the arterial blood gas the model reports is an emergent consequence of ventilation, perfusion, diffusion and metabolism rather than a prescribed output.
 
@@ -243,25 +235,25 @@ This single solver is what makes gas transport a whole-body property: the same e
 
 *Source: `explain/component_models/Metabolism.js`, `explain/component_models/Lactate.js`.*
 
-Whole-body oxygen consumption V̇O₂ (default 8.1 mL·kg⁻¹·min⁻¹) [10] is converted to a molar demand per step and distributed across tissue compartments by each site's fractional share *f*_VO₂ (the
+Whole-body oxygen consumption V̇O₂ (default 8.1 mL·kg⁻¹·min⁻¹) [11] is converted to a molar demand per step and distributed across tissue compartments by each site's fractional share *f*_VO₂ (the
 fractions sum to one across metabolically active sites):
 
-> **Eq. 24** &nbsp; ΔO₂ = (0.039·V̇O₂·*a*_VO₂·*Q*₁₀·*W* / 60)·Δt  &nbsp;[mmol]
+> **Eq. 21** &nbsp; ΔO₂ = (0.039·V̇O₂·*a*_VO₂·*Q*₁₀·*W* / 60)·Δt  &nbsp;[mmol]
 
-where 0.039 mmol·mL⁻¹ is the molar O₂ content at 37 °C and atmospheric pressure, *a*_VO₂ an external demand factor and *Q*₁₀ the temperature factor [11] written by the thermoregulation model (companion paper; 1.0 at 37 °C). Each site's O₂ is decremented and its CO₂ incremented by the respiratory quotient RQ (default 0.8):
+where 0.039 mmol·mL⁻¹ is the molar O₂ content at 37 °C and atmospheric pressure, *a*_VO₂ an external demand factor and *Q*₁₀ the temperature factor [12] written by the thermoregulation model (companion paper; 1.0 at 37 °C). Each site's O₂ is decremented and its CO₂ incremented by the respiratory quotient RQ (default 0.8):
 
-> **Eq. 25** &nbsp; *t*O₂ ← (*t*O₂·*V* − *f*_VO₂·ΔO₂)/*V*,  &nbsp; *t*CO₂ ← (*t*CO₂·*V* + RQ·*f*_VO₂·ΔO₂)/*V*
+> **Eq. 22** &nbsp; *t*O₂ ← (*t*O₂·*V* − *f*_VO₂·ΔO₂)/*V*,  &nbsp; *t*CO₂ ← (*t*CO₂·*V* + RQ·*f*_VO₂·ΔO₂)/*V*
 
-When tissue oxygenation falls below an anaerobic threshold, lactate is produced in proportion to the local oxygen debt [12]. For each tissue an anaerobic fraction is computed relative to a threshold set at a fraction of the site's resting-minimum oxygen content *t*O₂,rest (captured over a 90 s warm-up so the model is neutral even in chronically hypoxaemic scenarios):
+When tissue oxygenation falls below an anaerobic threshold, lactate is produced in proportion to the local oxygen debt [13]. For each tissue an anaerobic fraction is computed relative to a threshold set at a fraction of the site's resting-minimum oxygen content *t*O₂,rest (captured over a 90 s warm-up so the model is neutral even in chronically hypoxaemic scenarios):
 
-> **Eq. 26** &nbsp; Θ = *τ*_frac·*t*O₂,rest,  &nbsp; *a* = clamp((Θ − *t*O₂)/Θ, 0, 1)
+> **Eq. 23** &nbsp; Θ = *τ*_frac·*t*O₂,rest,  &nbsp; *a* = clamp((Θ − *t*O₂)/Θ, 0, 1)
 
-> **Eq. 27** &nbsp; *L* = *a*·*D*_O₂,site·*Y*·*g*,  &nbsp; [lactate] ← [lactate] + *L*/*V*
+> **Eq. 24** &nbsp; *L* = *a*·*D*_O₂,site·*Y*·*g*,  &nbsp; [lactate] ← [lactate] + *L*/*V*
 
 where *τ*_frac = 0.5, *D*_O₂,site is the site's molar O₂ demand over the update interval, *Y* = 0.33
 mmol lactate per mmol O₂ deficit (≈ 2 lactate/glucose over 6 O₂/glucose) and *g* a production gain. Lactate is cleared from every blood compartment by first-order relaxation toward a baseline (Cori-cycle/hepatic–renal handling):
 
-> **Eq. 28** &nbsp; [lactate] ← [lactate] + (*L*_base − [lactate])·*k*_cl·*u*
+> **Eq. 25** &nbsp; [lactate] ← [lactate] + (*L*_base − [lactate])·*k*_cl·*u*
 
 with *L*_base = 1.0 mmol·L⁻¹, *k*_cl = 2×10⁻³ s⁻¹ (t½ ≈ 6 min) and *u* the update interval.
 Because lactate is a strong anion (Eq. 15), a rise lowers SID and hence pH, HCO₃⁻ and base excess: the tissue-oxygen-debt → lactate → metabolic-acidosis loop is closed with no change to the acid–base solver itself. The models run in the fixed order Metabolism → Lactate → blood-composition so that each step's oxygen extraction, lactate production and acid–base consequence are consistent.
@@ -270,23 +262,23 @@ Because lactate is a strong anion (Eq. 15), a rise lowers SID and hence pH, HCO�
 
 *Source: `explain/component_models/Surfactant.js`.*
 
-Respiratory distress syndrome is modelled as a dynamic, pressure-driven balance between alveolar recruitment and derecruitment with hysteresis [13], modulated by surfactant maturity *s* ∈ [0,1] (0 = severe RDS, 1 = mature/treated). Surfactant therapy relaxes *s* toward its target with a time constant τ_surf (180 s, the acute recruitment response). The transpulmonary pressure signal is the mean alveolar recoil pressure over both lungs, low-pass-filtered to remove tidal swings:
+Respiratory distress syndrome is modelled as a dynamic, pressure-driven balance between alveolar recruitment and derecruitment with hysteresis [14], modulated by surfactant maturity *s* ∈ [0,1] (0 = severe RDS, 1 = mature/treated). Surfactant therapy relaxes *s* toward its target with a time constant τ_surf (180 s, the acute recruitment response). The transpulmonary pressure signal is the mean alveolar recoil pressure over both lungs, low-pass-filtered to remove tidal swings:
 
-> **Eq. 29** &nbsp; *P̄*_tp ← *P̄*_tp + (Δt/τ_p)·(*P*_tp − *P̄*_tp),  &nbsp; *P*_tp = mean_lungs(*p*_in)
+> **Eq. 26** &nbsp; *P̄*_tp ← *P̄*_tp + (Δt/τ_p)·(*P*_tp − *P̄*_tp),  &nbsp; *P*_tp = mean_lungs(*p*_in)
 
 Opening and closing pressure thresholds are auto-centred on a baseline transpulmonary pressure *P*₀ (captured over a 30 s warm-up) and shifted down by surfactant, so that therapy lowers the pressure needed to recruit alveoli:
 
-> **Eq. 30** &nbsp; TOP = *P*₀ + *m*_open − *g*_open·(*s* − *s*₀),  &nbsp; TCP = *P*₀ − *m*_close − *g*_close·(*s* − *s*₀)
+> **Eq. 27** &nbsp; TOP = *P*₀ + *m*_open − *g*_open·(*s* − *s*₀),  &nbsp; TCP = *P*₀ − *m*_close − *g*_close·(*s* − *s*₀)
 
 with margins *m*_open = *m*_close = 2 mmHg and gains *g*_open = 14, *g*_close = 12 mmHg per unit surfactant. The open fraction evolves by a recruitment/derecruitment ODE with a hysteresis dead zone (for TCP ≤ *P̄*_tp ≤ TOP both terms vanish and the open fraction holds):
 
-> **Eq. 31** &nbsp; d(open)/d*t* = *k*_open·max(0, *P̄*_tp − TOP)·(1 − open) − *k*_close·max(0, TCP − *P̄*_tp)·open
+> **Eq. 28** &nbsp; d(open)/d*t* = *k*_open·max(0, *P̄*_tp − TOP)·(1 − open) − *k*_close·max(0, TCP − *P̄*_tp)·open
 
 (*k*_open = *k*_close = 0.5 mmHg⁻¹·s⁻¹). The deviation of the open fraction from its baseline,
 *r* = open − *f*₀, drives four effector channels — lung elastance, functional residual capacity
 (unstressed volume), alveolar diffusion and intrapulmonary shunt — as bounded linear factors:
 
-> **Eq. 32** &nbsp; *f*_el = 1 − 0.7*r*,  *f*_uvol = 1 + 1.5*r*,  *f*_dif = 1 + 2.0*r*,  *f*_ips = 1 + 6.0*r*
+> **Eq. 29** &nbsp; *f*_el = 1 − 0.7*r*,  *f*_uvol = 1 + 1.5*r*,  *f*_dif = 1 + 2.0*r*,  *f*_ips = 1 + 6.0*r*
 
 so that derecruitment (negative *r*) simultaneously stiffens the lung, lowers FRC, impairs
 diffusion and increases intrapulmonary shunt — the coupled signature of RDS — while surfactant
@@ -297,7 +289,7 @@ disabled.
 
 ### 2.3 Software implementation and code verification
 
-See shared Methods S5 (reuse verbatim): framework-agnostic JavaScript/TypeScript engine running in a Web Worker, declarative JSON model definitions, real-time step loop, freely available at https://explain-modeling.com; the complete, annotated engine source code is publicly available at https://github.com/Dobutamine/explain-engine and archived with a persistent identifier at https://doi.org/10.5281/zenodo.21389097 [14]. The respiratory models run in the same insertion-ordered step loop as the circulation, sharing the blood compartments so that gas exchange, transport, metabolism and acid–base are solved together each step.
+See shared Methods S5 (reuse verbatim): framework-agnostic JavaScript/TypeScript engine running in a Web Worker, declarative JSON model definitions, real-time step loop, freely available at https://explain-modeling.com; the complete, annotated engine source code is publicly available at https://github.com/Dobutamine/explain-engine and archived with a persistent identifier at https://doi.org/10.5281/zenodo.21389097 [15]. The respiratory models run in the same insertion-ordered step loop as the circulation, sharing the blood compartments so that gas exchange, transport, metabolism and acid–base are solved together each step.
 
 ### 2.4 AI-assisted patient-specific parameterization (pointer)
 
@@ -380,7 +372,7 @@ baseline).
 
 ### 3.4 Metabolic acid–base perturbation
 
-Adding unmeasured strong anions (Eq. 15, the base-excess/pH lever) produced a graded metabolic acidosis — falling bicarbonate, base excess and pH — with the appropriate secondary respiratory compensation (falling PCO₂) as the open-loop ventilation responded to the acidaemia (Table 4). This demonstrates the Stewart solver's separation of the metabolic component (SID/UMA → HCO₃⁻, BE) from the respiratory component (ventilation → PCO₂). The same acidosis arises spontaneously from tissue oxygen debt through the lactate pathway (Eqs. 26–28), lactate entering Eq. 15 as a strong anion.
+Adding unmeasured strong anions (Eq. 15, the base-excess/pH lever) produced a graded metabolic acidosis — falling bicarbonate, base excess and pH — with the appropriate secondary respiratory compensation (falling PCO₂) as the open-loop ventilation responded to the acidaemia (Table 4). This demonstrates the Stewart solver's separation of the metabolic component (SID/UMA → HCO₃⁻, BE) from the respiratory component (ventilation → PCO₂). The same acidosis arises spontaneously from tissue oxygen debt through the lactate pathway (Eqs. 23–25), lactate entering Eq. 15 as a strong anion.
 
 **Table 4. Metabolic acidosis from added unmeasured anions** (UMA increment above baseline,
 mmol·L⁻¹).
@@ -396,7 +388,7 @@ converging envelope — see §4.4.)*
 
 ### 3.5 Respiratory distress and surfactant therapy
 
-In the preterm 28-week RDS scenario, administering surfactant (`administer_surfactant`, target maturity 0.9) drove progressive alveolar recruitment with the expected coupled improvement in every downstream variable (Table 5): the open fraction rose from 0.50 to 1.0, effective lung elastance fell (compliance rose) from 558 to 363 mmHg·L⁻¹, the diffusion factor rose and the intrapulmonary-shunt factor rose (shunt fell), and arterial PO₂ rose from 54.6 to 74.3 mmHg with SpO₂ from 90.7 to 96.1 % (Eqs. 29–32). The response developed over minutes (τ_surf = 180 s) and the recruitment showed the intended hysteresis. At baseline all four effector factors sat at unity, confirming the model is neutral in the untreated calibrated state.
+In the preterm 28-week RDS scenario, administering surfactant (`administer_surfactant`, target maturity 0.9) drove progressive alveolar recruitment with the expected coupled improvement in every downstream variable (Table 5): the open fraction rose from 0.50 to 1.0, effective lung elastance fell (compliance rose) from 558 to 363 mmHg·L⁻¹, the diffusion factor rose and the intrapulmonary-shunt factor rose (shunt fell), and arterial PO₂ rose from 54.6 to 74.3 mmHg with SpO₂ from 90.7 to 96.1 % (Eqs. 26–29). The response developed over minutes (τ_surf = 180 s) and the recruitment showed the intended hysteresis. At baseline all four effector factors sat at unity, confirming the model is neutral in the untreated calibrated state.
 
 **Table 5. Surfactant therapy time course** (preterm 28-week RDS; `probe_surfactant.mjs
 --scenario preterm_28wk --target 0.9`).
@@ -417,7 +409,7 @@ In the preterm 28-week RDS scenario, administering surfactant (`administer_surfa
 ### 4.1 Model originality
 
 The respiratory subsystem described here is, to our knowledge, distinctive less in any single
-component than in their integration. Its individual elements are grounded in established physiology — an elastance-based description of gas compartments and chest-wall mechanics, a Fick description of alveolar–capillary diffusion, a physicochemical (Stewart) treatment of acid–base equilibrium, a Hill oxygen-dissociation curve with the classical P₅₀-shifting factors, and a recruitment model of surfactant-dependent lung mechanics. What the model adds is to solve all of these together, in real time, on a single shared blood substrate that it also shares with the circulation of the companion paper. Because oxygen and carbon dioxide are carried as total contents that circulate with the blood and are converted to partial pressures, pH, bicarbonate and saturation everywhere blood exists, the arterial blood gas the model reports is not an assigned output but an emergent property of the coupled system: it moves only when ventilation, perfusion, diffusion or metabolism moves. This is what makes the model explanatory rather than merely descriptive — a change made anywhere propagates to the monitored quantities through the same mechanistic pathways a clinician would reason along.
+component than in their integration. Its individual elements are grounded in established physiology — an elastance-based description of gas compartments and chest-wall mechanics, a Fick description of alveolar–capillary diffusion, a physicochemical (Stewart) treatment of acid–base equilibrium (published separately [4]), a Hill oxygen-dissociation curve with the classical P₅₀-shifting factors, and a recruitment model of surfactant-dependent lung mechanics. What the model adds is to solve all of these together, in real time, in a single set of blood compartments shared with the circulation of the companion paper. Because oxygen and carbon dioxide are carried as total contents that circulate with the blood and are converted to partial pressures, pH, bicarbonate and saturation everywhere blood exists, the arterial blood gas the model reports is not an assigned output but an emergent property of the coupled system: it moves only when ventilation, perfusion, diffusion or metabolism moves. This is what makes the model explanatory rather than merely descriptive — a change made anywhere propagates to the monitored quantities through the same mechanistic pathways a clinician would reason along.
 
 A second, cross-cutting element of originality, shared with the other papers in the series, is the
 way the model is fitted to a patient. Lumped-parameter models expose many free parameters against few measurements, and the traditional remedy — expert hand-tuning — is slow, irreproducible and hard to audit. Here the respiratory and acid–base parameters are set by the AI-assisted closed-loop pipeline of the companion parameterization paper: a large language model interprets the available clinical targets and a deterministic calibrator drives one physiologically interpretable lever per target onto its value. The lever structure is itself a piece of encoded physiology — alveolar diffusion drives oxygenation, ventilatory drive drives carbon dioxide, and unmeasured strong anions drive base excess and pH — chosen to respect the model's own active control loops rather than to fight them (Section 2.4). Because every automated adjustment is expressed through the same bounded, schema-checked parameters as a manual edit, patient-specific instantiation is both rapid and reproducible.
@@ -428,7 +420,7 @@ The simulations of Section 3 show that the model reproduces the expected qualita
 quantitative behaviour of neonatal respiratory and acid–base physiology. The calibrated baseline
 sits within neonatal reference ranges across the full blood gas (Table 1). Arterial oxygenation
 rises monotonically with inspired oxygen fraction and with alveolar diffusing capacity, with the
-saturating approach of oxygen saturation toward 100 % that the sigmoid dissociation curve dictates, while carbon-dioxide tension is appropriately insensitive to inspired oxygen (Tables 2a–b). Carbon dioxide varies inversely with ventilation, carrying pH into a respiratory acidosis or alkalosis as expected (Table 3). Added unmeasured anions produce a graded metabolic acidosis — falling bicarbonate, base excess and pH — cleanly separated by the Stewart formulation from the respiratory axis, with the appropriate secondary respiratory compensation (Table 4). And in the preterm RDS scenario, surfactant administration recruits the lung over minutes, simultaneously improving compliance, diffusion, shunt and oxygenation — the coupled signature of the syndrome resolving as a single physiological process (Table 5). The parameter values that produce these behaviours are traceable to standard physiological sources (see `_references.md`); where an engine constant departs from a common textbook value — for example the base-excess offset (25.1 rather than 24.4) [8] or the compartment-specific P₅₀ baselines representing fetal, neonatal and adult haemoglobin affinity (18.8, 20.0, 26.7 mmHg) [6] — we state the value used and cite the source it was adapted from rather than silently normalizing it.
+saturating approach of oxygen saturation toward 100 % that the sigmoid dissociation curve dictates, while carbon-dioxide tension is appropriately insensitive to inspired oxygen (Tables 2a–b). Carbon dioxide varies inversely with ventilation, carrying pH into a respiratory acidosis or alkalosis as expected (Table 3). Added unmeasured anions produce a graded metabolic acidosis — falling bicarbonate, base excess and pH — cleanly separated by the Stewart formulation from the respiratory axis, with the appropriate secondary respiratory compensation (Table 4). And in the preterm RDS scenario, surfactant administration recruits the lung over minutes, simultaneously improving compliance, diffusion, shunt and oxygenation — the coupled signature of the syndrome resolving as a single physiological process (Table 5). The parameter values that produce these behaviours are traceable to standard physiological sources (see `_references.md`); where an engine constant departs from a common textbook value — for example the base-excess offset (25.1 rather than 24.4) [9] or the compartment-specific P₅₀ baselines representing fetal, neonatal and adult haemoglobin affinity (18.8, 20.0, 26.7 mmHg) [7] — we state the value used and cite the source it was adapted from rather than silently normalizing it.
 
 We emphasize that these are demonstrations of mechanistic behaviour, not a formal clinical
 validation. The purpose of this paper is to specify the model and to show that it behaves
@@ -446,11 +438,11 @@ is to literature ranges and pattern, not to prospective individual-patient data.
 ### 4.3 Reproducibility and model expansion
 
 Every quantitative result in this paper is reproduced from the engine by a named script — the
-baseline blood gas by `probe_vitals.mjs`, the oxygenation, ventilation and acid–base sweeps by `probe_respiratory.mjs`, and the surfactant time course by `probe_surfactant.mjs` — so that each figure and table can be regenerated and audited. The model itself is defined declaratively: complete scenarios, including the respiratory anatomy and its parameters, are JSON model definitions, and each physiological process is a small self-contained module implementing the equations of Section 2. New components — additional metabolic sites, alternative dissociation chemistry, further lung pathologies — are added as modules without modifying the engine, which is what allowed the respiratory subsystem to be built on the same substrate as the circulation.
+baseline blood gas by `probe_vitals.mjs`, the oxygenation, ventilation and acid–base sweeps by `probe_respiratory.mjs`, and the surfactant time course by `probe_surfactant.mjs` — so that each figure and table can be regenerated and audited. The model itself is defined declaratively: complete scenarios, including the respiratory anatomy and its parameters, are JSON model definitions, and each physiological process is a small self-contained module implementing the equations of Section 2. New components — additional metabolic sites, alternative dissociation chemistry, further lung pathologies — are added as modules without modifying the engine, which is what allowed the respiratory subsystem to be built on the same shared engine as the circulation.
 
 ### 4.4 Limitations
 
-The model makes the simplifications characteristic of a real-time lumped-parameter approach. Gas exchange is represented by paired alveolar compartments rather than a continuous distribution of ventilation-to-perfusion ratios, so V/Q mismatch is captured only in aggregate (through intrapulmonary shunt and the two-lung split) and cannot reproduce the full shape of a shunt or dead-space curve [15]. Dead-space and alveolar ventilation are not separately partitioned. Time integration is explicit forward-Euler at a fixed step, chosen for real-time performance; the
+The model makes the simplifications characteristic of a real-time lumped-parameter approach. Gas exchange is represented by paired alveolar compartments rather than a continuous distribution of ventilation-to-perfusion ratios, so V/Q mismatch is captured only in aggregate (through intrapulmonary shunt and the two-lung split) and cannot reproduce the full shape of a shunt or dead-space curve [16]. Dead-space and alveolar ventilation are not separately partitioned. Time integration is explicit forward-Euler at a fixed step, chosen for real-time performance; the
 acid–base and oxygen equilibria are, by contrast, solved to convergence each step by a bounded Brent root-finder, but that solver has a finite operating envelope — at extreme acid loads the pH can fall outside its dynamic search window and the reported value becomes unreliable, as noted for the most severe unmeasured-anion perturbation in Section 3.4; the clinically relevant range lies well within the converging envelope. The Haldane/Bohr coupling between oxygen saturation and carbon-dioxide carriage uses the previous step's saturation to break the circular dependence, which is exact at steady state and introduces only a one-step lag during transients. Metabolism distributes a single whole-body oxygen-consumption figure across tissues by fixed fractional shares rather than deriving each organ's consumption from its own work and perfusion.
 
 ### 4.5 Future work
@@ -462,7 +454,7 @@ Several extensions follow naturally. Regional ventilation-to-perfusion heterogen
 ## Conclusion
 
 The respiratory subsystem of EXPLAIN provides a transparent, real-time, mechanistic account of
-neonatal ventilation, alveolar gas exchange, blood-gas transport, acid–base chemistry, metabolism and surfactant-dependent lung recruitment. By solving these processes together on a blood substrate shared with the circulation, the model makes the arterial blood gas an emergent consequence of the underlying physiology rather than a prescribed output, and by fitting the model to individual patients through an AI-assisted closed-loop calibration pipeline it removes the hand-tuning bottleneck that has limited the individualization of lumped-parameter models. Together with its cardiovascular companion, it offers an integrated, interpretable and freely available platform for teaching and investigating neonatal cardiorespiratory physiology.
+neonatal ventilation, alveolar gas exchange, blood-gas transport, acid–base chemistry, metabolism and surfactant-dependent lung recruitment. By solving these processes together in the same blood compartments as the circulation, the model makes the arterial blood gas an emergent consequence of the underlying physiology rather than a prescribed output, and by fitting the model to individual patients through an AI-assisted closed-loop calibration pipeline it removes the hand-tuning bottleneck that has limited the individualization of lumped-parameter models. Together with its cardiovascular companion, it offers an integrated, interpretable and freely available platform for teaching and investigating neonatal cardiorespiratory physiology.
 
 ---
 
@@ -475,18 +467,19 @@ assembly. PMIDs verified against PubMed unless marked as a historical primary so
 1. Papastamelos C, Panitch HB, England SE, Allen JL. Developmental changes in chest wall compliance in infancy and early childhood. *J Appl Physiol (1985).* 1995;78(1):179–84. PMID 7713809. doi:10.1152/jappl.1995.78.1.179.
 2. Mecklenburgh JS, al-Obaidi TA, Mapleson WW. A model lung with direct representation of respiratory muscle activity. *Br J Anaesth.* 1992;68(6):603–12. PMID 1610636. doi:10.1093/bja/68.6.603.
 3. Fick A. Ueber Diffusion. *Ann Phys.* 1855;170(1):59–86. doi:10.1002/andp.18551700105. *(Historical primary source; not in PubMed.)*
-4. Stewart PA. Modern quantitative acid–base chemistry. *Can J Physiol Pharmacol.* 1983;61(12):1444–61. PMID 6423247. doi:10.1139/y83-207.
-5. Stewart PA. Independent and dependent variables of acid–base control. *Respir Physiol.* 1978;33(1):9–26. PMID 27857. doi:10.1016/0034-5687(78)90079-8.
-6. Dash RK, Bassingthwaighte JB. Blood HbO₂ and HbCO₂ dissociation curves at varied O₂, CO₂, pH, 2,3-DPG and temperature levels. *Ann Biomed Eng.* 2004;32(12):1676–93. PMID 15682524. doi:10.1007/s10439-004-7821-6. *(Cite with the corrected-equations erratum: Ann Biomed Eng. 2010;38(4):1683–701. PMID 20162361. doi:10.1007/s10439-010-9948-y.)*
-7. Figge J, Rossing TH, Fencl V. The role of serum proteins in acid–base equilibria. *J Lab Clin Med.* 1991;117(6):453–67. PMID 2045713.
-8. Siggaard-Andersen O. The van Slyke equation. *Scand J Clin Lab Invest Suppl.* 1977;146:15–20. PMID 13478. doi:10.3109/00365517709098927.
-9. Hill AV. The possible effects of the aggregation of the molecules of haemoglobin on its dissociation curves. *J Physiol.* 1910;40(Suppl):iv–vii. *(Historical primary source; not in PubMed. Hill coefficient n = 2.7.)*
-10. Wahlig TM, Gatto CW, Boros SJ, Mammel MC, Mills MM, Georgieff MK. Metabolic response of preterm infants to variable degrees of respiratory illness. *J Pediatr.* 1994;124(2):283–8. PMID 8301440. doi:10.1016/s0022-3476(94)70321-3.
-11. Schmidt-Nielsen K. *Animal Physiology: Adaptation and Environment.* 5th ed. Cambridge: Cambridge University Press; 1997. *(Textbook anchor for the Q₁₀ temperature coefficient / van 't Hoff principle; no single canonical PubMed paper.)*
-12. Hall JE, Hall ME. *Guyton and Hall Textbook of Medical Physiology.* 14th ed. Philadelphia: Elsevier; 2021. *(Textbook anchor for anaerobic lactate production under oxygen debt and its Cori-cycle/hepatic–renal clearance; no single canonical primary paper.)*
-13. Bachofen H, Schürch S, Urbinelli M, Weibel ER. Relations among alveolar surface tension, surface area, volume, and recoil pressure. *J Appl Physiol (1985).* 1987;62(5):1878–87. PMID 3597262. doi:10.1152/jappl.1987.62.5.1878.
-14. Antonius T. *Explain: a whole-body physiological simulation engine* (Version v0.1.0) [Software]. Zenodo; 2026. doi:10.5281/zenodo.21389097 (concept/all-versions DOI). Source: https://github.com/Dobutamine/explain-engine (MIT). Interactive model: https://explain-modeling.com.
-15. Wagner PD, Saltzman HA, West JB. Measurement of continuous distributions of ventilation–perfusion ratios: theory. *J Appl Physiol.* 1974;36(5):588–99. PMID 4826323. doi:10.1152/jappl.1974.36.5.588.
+4. Antonius TAJ, van Meurs WWL, Westerhof BE, de Boode WP. A white-box model for real-time simulation of acid–base balance in blood plasma. *Adv Simul (Lond).* 2023;8(1):16. PMID 37322544. doi:10.1186/s41077-023-00255-2. *(The authors' prior publication of the plasma CO₂/pH/HCO₃⁻ Stewart solver summarized in Section 2.2.4.)*
+5. Stewart PA. Modern quantitative acid–base chemistry. *Can J Physiol Pharmacol.* 1983;61(12):1444–61. PMID 6423247. doi:10.1139/y83-207.
+6. Stewart PA. Independent and dependent variables of acid–base control. *Respir Physiol.* 1978;33(1):9–26. PMID 27857. doi:10.1016/0034-5687(78)90079-8.
+7. Dash RK, Bassingthwaighte JB. Blood HbO₂ and HbCO₂ dissociation curves at varied O₂, CO₂, pH, 2,3-DPG and temperature levels. *Ann Biomed Eng.* 2004;32(12):1676–93. PMID 15682524. doi:10.1007/s10439-004-7821-6. *(Cite with the corrected-equations erratum: Ann Biomed Eng. 2010;38(4):1683–701. PMID 20162361. doi:10.1007/s10439-010-9948-y.)*
+8. Figge J, Rossing TH, Fencl V. The role of serum proteins in acid–base equilibria. *J Lab Clin Med.* 1991;117(6):453–67. PMID 2045713.
+9. Siggaard-Andersen O. The van Slyke equation. *Scand J Clin Lab Invest Suppl.* 1977;146:15–20. PMID 13478. doi:10.3109/00365517709098927.
+10. Hill AV. The possible effects of the aggregation of the molecules of haemoglobin on its dissociation curves. *J Physiol.* 1910;40(Suppl):iv–vii. *(Historical primary source; not in PubMed. Hill coefficient n = 2.7.)*
+11. Wahlig TM, Gatto CW, Boros SJ, Mammel MC, Mills MM, Georgieff MK. Metabolic response of preterm infants to variable degrees of respiratory illness. *J Pediatr.* 1994;124(2):283–8. PMID 8301440. doi:10.1016/s0022-3476(94)70321-3.
+12. Schmidt-Nielsen K. *Animal Physiology: Adaptation and Environment.* 5th ed. Cambridge: Cambridge University Press; 1997. *(Textbook anchor for the Q₁₀ temperature coefficient / van 't Hoff principle; no single canonical PubMed paper.)*
+13. Hall JE, Hall ME. *Guyton and Hall Textbook of Medical Physiology.* 14th ed. Philadelphia: Elsevier; 2021. *(Textbook anchor for anaerobic lactate production under oxygen debt and its Cori-cycle/hepatic–renal clearance; no single canonical primary paper.)*
+14. Bachofen H, Schürch S, Urbinelli M, Weibel ER. Relations among alveolar surface tension, surface area, volume, and recoil pressure. *J Appl Physiol (1985).* 1987;62(5):1878–87. PMID 3597262. doi:10.1152/jappl.1987.62.5.1878.
+15. Antonius T. *Explain: a whole-body physiological simulation engine* (Version v0.1.0) [Software]. Zenodo; 2026. doi:10.5281/zenodo.21389097 (concept/all-versions DOI). Source: https://github.com/Dobutamine/explain-engine (MIT). Interactive model: https://explain-modeling.com.
+16. Wagner PD, Saltzman HA, West JB. Measurement of continuous distributions of ventilation–perfusion ratios: theory. *J Appl Physiol.* 1974;36(5):588–99. PMID 4826323. doi:10.1152/jappl.1974.36.5.588.
 
 *Full working pool and provenance notes: `_references.md`. The AI-use disclosure and the
 parameterization-method citations are carried by the companion paper [P6]; this paper's §2.4 is a
