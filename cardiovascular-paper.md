@@ -27,7 +27,7 @@ partially understood, yet diagnostic reasoning, clinical decision-making and com
 "EXPLAIN", is a pulsatile, lumped-parameter representation of the neonatal heart and vascular
 system that accommodates multiple neonatal-specific features (e.g. foramen ovale and ductus
 arteriosus). The patient-specific configurations validated here were produced by an automated
-calibration pipeline rather than by hand.
+AI-assisted calibration pipeline rather than by hand.
 
 **Results:** The model replicates both normal neonatal hemodynamics and pathological conditions
 such as a patent ductus arteriosus and acute pulmonary hypertension, using published literature as target data. Simulation results show close agreement with measured values for hemodynamic quantities including cardiac output, blood pressures and ductal Doppler flow patterns across a range of shunt magnitudes.
