@@ -157,11 +157,15 @@ circulation (companion cardiovascular paper) and every organ that carries blood.
 CO₂/pH/bicarbonate core is the white-box Stewart model we published previously [4]; it is summarized
 here and extended with oxygen transport and a Haldane saturation–CO₂ coupling.*
 
-Blood carries O₂ and CO₂ as total contents *t*O₂ and *t*CO₂ (mmol·L⁻¹) plus plasma strong ions and buffers. The solver converts these, at compartment temperature *T* and haemoglobin concentration, into pH, PCO₂, bicarbonate, base excess, PO₂ and saturation, following the Stewart approach [5,6]: the independent variables are the strong-ion difference, total CO₂, total weak-acid buffers and total O₂; the dependent variables (pH, PCO₂, PO₂, SO₂) follow from chemical equilibrium and electroneutrality.
+Blood carries oxygen and carbon dioxide as total contents *t*O₂ and *t*CO₂ (mmol·L⁻¹) together with the plasma strong ions and buffers, and it does not merely hold these — it transports them. There is no separate transport solver: whenever the circulation advects a volume Δ*V* between two blood compartments (the resistor flows of the companion cardiovascular model), every transported content *X* of the receiving compartment (volume *V*, upstream content *X*_up) is updated by mixing on the incoming-volume fraction (shared Methods, Eq. S2; engine `BloodCapacitance.volume_in`):
+
+$$X \leftarrow X + (X_{\text{up}} - X)\,\frac{\Delta V}{V}, \qquad X \in \{t\mathrm{O_2},\, t\mathrm{CO_2},\, [\mathrm{Na^+}], [\mathrm{K^+}], [\mathrm{Cl^-}], [\mathrm{Ca^{2+}}], [\mathrm{Mg^{2+}}], [\mathrm{lactate^-}], \text{buffers}\} \tag{15}$$
+
+so the gas contents, the plasma strong ions and weak-acid buffers, and lactate are all carried between compartments as blood flows. The solver then acts, at each compartment and each step, on the contents delivered there — which is what makes the arterial blood gas a whole-body rather than a local property. It converts these, at compartment temperature *T* and haemoglobin concentration, into pH, PCO₂, bicarbonate, base excess, PO₂ and saturation, following the Stewart approach [5,6]: the independent variables are the strong-ion difference, total CO₂, total weak-acid buffers and total O₂; the dependent variables (pH, PCO₂, PO₂, SO₂) follow from chemical equilibrium and electroneutrality.
 
 **Strong-ion difference.** The apparent strong-ion difference is
 
-$$\mathrm{SID} = [\mathrm{Na^+}] + [\mathrm{K^+}] + 2[\mathrm{Ca^{2+}}] + 2[\mathrm{Mg^{2+}}] - [\mathrm{Cl^-}] - [\mathrm{lactate^-}] \tag{15}$$
+$$\mathrm{SID} = [\mathrm{Na^+}] + [\mathrm{K^+}] + 2[\mathrm{Ca^{2+}}] + 2[\mathrm{Mg^{2+}}] - [\mathrm{Cl^-}] - [\mathrm{lactate^-}] \tag{16}$$
 
 so lactate enters directly as a strong anion — the coupling exploited by the metabolic-acidosis
 model (Section 2.2.5).
@@ -171,30 +175,30 @@ bicarbonate and carbonate, and buffered by albumin and phosphate (their pH-depen
 
 **Electroneutrality.** pH is found as the [H⁺] that makes plasma electrically neutral:
 
-$$g([\mathrm{H^+}]) = [\mathrm{H^+}] + \mathrm{SID} - [\mathrm{HCO_3^-}] - 2[\mathrm{CO_3^{2-}}] - [\mathrm{OH^-}] - A^- - [\mathrm{UMA}] = 0 \tag{16}$$
+$$g([\mathrm{H^+}]) = [\mathrm{H^+}] + \mathrm{SID} - [\mathrm{HCO_3^-}] - 2[\mathrm{CO_3^{2-}}] - [\mathrm{OH^-}] - A^- - [\mathrm{UMA}] = 0 \tag{17}$$
 
 where UMA is the concentration of unmeasured/unidentified strong anions — the calibration lever for base excess and pH (Section 2.4). The dissociation constants, the bounded [H⁺] root-finder and the solver's verification against 1864 neonatal blood-gas samples are given in the published paper [4]. From the converged solution the base excess is computed by the Van Slyke expression [9]
 
-$$\mathrm{BE} = \big([\mathrm{HCO_3^-}] - 25.1 + (2.3\,\mathrm{Hb} + 7.7)(\mathrm{pH} - 7.4)\big)(1 - 0.023\,\mathrm{Hb}) \tag{17}$$
+$$\mathrm{BE} = \big([\mathrm{HCO_3^-}] - 25.1 + (2.3\,\mathrm{Hb} + 7.7)(\mathrm{pH} - 7.4)\big)(1 - 0.023\,\mathrm{Hb}) \tag{18}$$
 
 (Hb in mmol·L⁻¹).
 
 **Oxygen transport.** The oxygen–haemoglobin dissociation curve is a Hill relation [10] whose half-
 saturation tension P₅₀ shifts with pH (Bohr effect), PCO₂, temperature and 2,3-DPG [7]:
 
-$$\log_{10} P_{50} = \log_{10} P_{50,0} - 0.48\,\Delta\mathrm{pH} + 0.0015\,\Delta\mathrm{PCO_2} + 0.024\,\Delta T + 0.051\,\Delta\mathrm{DPG} \tag{18}$$
+$$\log_{10} P_{50} = \log_{10} P_{50,0} - 0.48\,\Delta\mathrm{pH} + 0.0015\,\Delta\mathrm{PCO_2} + 0.024\,\Delta T + 0.051\,\Delta\mathrm{DPG} \tag{19}$$
 
-$$S_{\mathrm{O_2}} = \frac{P_{\mathrm{O_2}}^{\,n}}{P_{\mathrm{O_2}}^{\,n} + P_{50}^{\,n}}, \quad n = 2.7 \tag{19}$$
+$$S_{\mathrm{O_2}} = \frac{P_{\mathrm{O_2}}^{\,n}}{P_{\mathrm{O_2}}^{\,n} + P_{50}^{\,n}}, \quad n = 2.7 \tag{20}$$
 
 where ΔpH = pH − 7.40, ΔPCO₂ = PCO₂ − 40, Δ*T* = *T* − 37, ΔDPG = DPG − 5, and P₅₀,₀ is the
 compartment's intrinsic O₂-haemoglobin affinity baseline (fetal haemoglobin 18.8, neonatal 20.0,
 adult 26.7 mmHg — the mechanism by which fetal blood's higher affinity is represented). Total
 oxygen content combines dissolved and haemoglobin-bound O₂,
 
-$$t\mathrm{O_2} = (0.0031\,P_{\mathrm{O_2}} + 1.36\,\mathrm{Hb_{gdl}}\,S_{\mathrm{O_2}})\cdot 10\cdot\frac{760}{R\,(273.15 + T)} \tag{20}$$
+$$t\mathrm{O_2} = (0.0031\,P_{\mathrm{O_2}} + 1.36\,\mathrm{Hb_{gdl}}\,S_{\mathrm{O_2}})\cdot 10\cdot\frac{760}{R\,(273.15 + T)} \tag{21}$$
 
 with Hb_gdl = Hb/0.6206 the haemoglobin in g·dL⁻¹. For known *t*O₂ the arterial *P*_O₂ (and hence
-S_O₂) is found by a second Brent root-find of Eq. 20, seeded from the previous *P*_O₂ ±10 mmHg.
+S_O₂) is found by a second Brent root-find of Eq. 21, seeded from the previous *P*_O₂ ±10 mmHg.
 
 This single solver makes gas transport a whole-body property: the same equations run in the pulmonary capillaries (loading O₂, unloading CO₂), the systemic tissues (the reverse), and every monitored blood compartment, so the arterial blood gas is an emergent consequence of ventilation, perfusion, diffusion and metabolism rather than a prescribed output.
 
@@ -205,25 +209,25 @@ This single solver makes gas transport a whole-body property: the same equations
 Whole-body oxygen consumption V̇O₂ (default 8.1 mL·kg⁻¹·min⁻¹) [11] is converted to a molar demand per step and distributed across tissue compartments by each site's fractional share *f*_VO₂ (the
 fractions sum to one across metabolically active sites):
 
-$$\Delta\mathrm{O_2} = \frac{0.039\,\dot V\mathrm{O_2}\,a_{V\mathrm{O_2}}\,Q_{10}\,W}{60}\cdot\Delta t\ \ [\mathrm{mmol}] \tag{21}$$
+$$\Delta\mathrm{O_2} = \frac{0.039\,\dot V\mathrm{O_2}\,a_{V\mathrm{O_2}}\,Q_{10}\,W}{60}\cdot\Delta t\ \ [\mathrm{mmol}] \tag{22}$$
 
 where 0.039 mmol·mL⁻¹ is the molar O₂ content at 37 °C and atmospheric pressure, *a*_VO₂ an external demand factor and *Q*₁₀ the temperature factor [12] written by the thermoregulation model (companion paper; 1.0 at 37 °C). Each site's O₂ is decremented and its CO₂ incremented by the respiratory quotient RQ (default 0.8):
 
-$$t\mathrm{O_2} \leftarrow \frac{t\mathrm{O_2}\,V - f_{V\mathrm{O_2}}\,\Delta\mathrm{O_2}}{V}, \quad t\mathrm{CO_2} \leftarrow \frac{t\mathrm{CO_2}\,V + \mathrm{RQ}\,f_{V\mathrm{O_2}}\,\Delta\mathrm{O_2}}{V} \tag{22}$$
+$$t\mathrm{O_2} \leftarrow \frac{t\mathrm{O_2}\,V - f_{V\mathrm{O_2}}\,\Delta\mathrm{O_2}}{V}, \quad t\mathrm{CO_2} \leftarrow \frac{t\mathrm{CO_2}\,V + \mathrm{RQ}\,f_{V\mathrm{O_2}}\,\Delta\mathrm{O_2}}{V} \tag{23}$$
 
 When tissue oxygenation falls below an anaerobic threshold, lactate is produced in proportion to the local oxygen debt [13]. For each tissue an anaerobic fraction is computed relative to a threshold set at a fraction of the site's resting-minimum oxygen content *t*O₂,rest (captured over a 90 s warm-up so the model is neutral even in chronically hypoxaemic scenarios):
 
-$$\Theta = \tau_{\text{frac}}\,(t\mathrm{O_2})_{\text{rest}}, \quad a = \mathrm{clamp}\!\left(\frac{\Theta - t\mathrm{O_2}}{\Theta},\, 0,\, 1\right) \tag{23}$$
+$$\Theta = \tau_{\text{frac}}\,(t\mathrm{O_2})_{\text{rest}}, \quad a = \mathrm{clamp}\!\left(\frac{\Theta - t\mathrm{O_2}}{\Theta},\, 0,\, 1\right) \tag{24}$$
 
-$$L = a\,D_{\mathrm{O_2},\text{site}}\,Y\,g, \quad [\text{lactate}] \leftarrow [\text{lactate}] + \frac{L}{V} \tag{24}$$
+$$L = a\,D_{\mathrm{O_2},\text{site}}\,Y\,g, \quad [\text{lactate}] \leftarrow [\text{lactate}] + \frac{L}{V} \tag{25}$$
 
 where *τ*_frac = 0.5, *D*_O₂,site is the site's molar O₂ demand over the update interval, *Y* = 0.33
 mmol lactate per mmol O₂ deficit (≈ 2 lactate/glucose over 6 O₂/glucose) and *g* a production gain. Lactate is cleared from every blood compartment by first-order relaxation toward a baseline (Cori-cycle/hepatic–renal handling):
 
-$$[\text{lactate}] \leftarrow [\text{lactate}] + (L_{\text{base}} - [\text{lactate}])\,k_{\text{cl}}\,u \tag{25}$$
+$$[\text{lactate}] \leftarrow [\text{lactate}] + (L_{\text{base}} - [\text{lactate}])\,k_{\text{cl}}\,u \tag{26}$$
 
 with *L*_base = 1.0 mmol·L⁻¹, *k*_cl = 2×10⁻³ s⁻¹ (t½ ≈ 6 min) and *u* the update interval.
-Because lactate is a strong anion (Eq. 15), a rise lowers SID and hence pH, HCO₃⁻ and base excess: the oxygen-debt → lactate → metabolic-acidosis loop closes with no change to the solver itself. The models run in the fixed order Metabolism → Lactate → blood-composition so each step's oxygen extraction, lactate production and acid–base consequence are consistent.
+Because lactate is a strong anion (Eq. 16), a rise lowers SID and hence pH, HCO₃⁻ and base excess: the oxygen-debt → lactate → metabolic-acidosis loop closes with no change to the solver itself. The models run in the fixed order Metabolism → Lactate → blood-composition so each step's oxygen extraction, lactate production and acid–base consequence are consistent.
 
 #### 2.2.6 Surfactant and dynamic alveolar recruitment (RDS)
 
@@ -231,21 +235,21 @@ Because lactate is a strong anion (Eq. 15), a rise lowers SID and hence pH, HCO�
 
 Respiratory distress syndrome is modelled as a dynamic, pressure-driven balance between alveolar recruitment and derecruitment with hysteresis [14], modulated by surfactant maturity *s* ∈ [0,1] (0 = severe RDS, 1 = mature/treated). Surfactant therapy relaxes *s* toward its target with a time constant τ_surf (180 s, the acute recruitment response). The transpulmonary pressure signal is the mean alveolar recoil pressure over both lungs, low-pass-filtered to remove tidal swings:
 
-$$\bar P_{\text{tp}} \leftarrow \bar P_{\text{tp}} + \frac{\Delta t}{\tau_p}\,(P_{\text{tp}} - \bar P_{\text{tp}}), \quad P_{\text{tp}} = \mathrm{mean_{lungs}}(p_{\text{in}}) \tag{26}$$
+$$\bar P_{\text{tp}} \leftarrow \bar P_{\text{tp}} + \frac{\Delta t}{\tau_p}\,(P_{\text{tp}} - \bar P_{\text{tp}}), \quad P_{\text{tp}} = \mathrm{mean_{lungs}}(p_{\text{in}}) \tag{27}$$
 
 Opening and closing pressure thresholds are auto-centred on a baseline transpulmonary pressure *P*₀ (captured over a 30 s warm-up) and shifted down by surfactant, so that therapy lowers the pressure needed to recruit alveoli:
 
-$$\mathrm{TOP} = P_0 + m_{\text{open}} - g_{\text{open}}\,(s - s_0), \quad \mathrm{TCP} = P_0 - m_{\text{close}} - g_{\text{close}}\,(s - s_0) \tag{27}$$
+$$\mathrm{TOP} = P_0 + m_{\text{open}} - g_{\text{open}}\,(s - s_0), \quad \mathrm{TCP} = P_0 - m_{\text{close}} - g_{\text{close}}\,(s - s_0) \tag{28}$$
 
 with margins *m*_open = *m*_close = 2 mmHg and gains *g*_open = 14, *g*_close = 12 mmHg per unit surfactant. The open fraction evolves by a recruitment/derecruitment ODE with a hysteresis dead zone (for TCP ≤ *P̄*_tp ≤ TOP both terms vanish and the open fraction holds):
 
-$$\frac{\mathrm{d(open)}}{\mathrm{d}t} = k_{\text{open}}\,\max(0,\, \bar P_{\text{tp}} - \mathrm{TOP})\,(1 - \text{open}) - k_{\text{close}}\,\max(0,\, \mathrm{TCP} - \bar P_{\text{tp}})\,\text{open} \tag{28}$$
+$$\frac{\mathrm{d(open)}}{\mathrm{d}t} = k_{\text{open}}\,\max(0,\, \bar P_{\text{tp}} - \mathrm{TOP})\,(1 - \text{open}) - k_{\text{close}}\,\max(0,\, \mathrm{TCP} - \bar P_{\text{tp}})\,\text{open} \tag{29}$$
 
 (*k*_open = *k*_close = 0.5 mmHg⁻¹·s⁻¹). The deviation of the open fraction from its baseline,
 *r* = open − *f*₀, drives four effector channels — lung elastance, functional residual capacity
 (unstressed volume), alveolar diffusion and intrapulmonary shunt — as bounded linear factors:
 
-$$f_{\text{el}} = 1 - 0.7r, \quad f_{\text{uvol}} = 1 + 1.5r, \quad f_{\text{dif}} = 1 + 2.0r, \quad f_{\text{ips}} = 1 + 6.0r \tag{29}$$
+$$f_{\text{el}} = 1 - 0.7r, \quad f_{\text{uvol}} = 1 + 1.5r, \quad f_{\text{dif}} = 1 + 2.0r, \quad f_{\text{ips}} = 1 + 6.0r \tag{30}$$
 
 so derecruitment (negative *r*) simultaneously stiffens the lung, lowers FRC, impairs diffusion and increases intrapulmonary shunt — the coupled signature of RDS — while surfactant or recruiting pressure reverses all four. The elastance, FRC and diffusion factors are written to the non-persistent factor layer (composing with the Respiration controller's persistent layer); the shunt uses the persistent resistance layer, released to unity when disabled.
 
@@ -311,7 +315,7 @@ of baseline).
 
 ### 3.3 Carbon dioxide vs ventilatory drive
 
-Scaling the reference minute ventilation produced the expected inverse PCO₂–ventilation relation and respiratory pH shift (Table 3): lowering drive raised PCO₂ toward respiratory acidosis, raising it lowered PCO₂ into alkalosis, with respiratory rate tracking ventilation (Eqs. 9–11 with 13–17).
+Scaling the reference minute ventilation produced the expected inverse PCO₂–ventilation relation and respiratory pH shift (Table 3): lowering drive raised PCO₂ toward respiratory acidosis, raising it lowered PCO₂ into alkalosis, with respiratory rate tracking ventilation (Eqs. 9–11 with 13–18).
 
 **Table 3. Arterial CO₂ and pH vs ventilatory drive** (minute-ventilation reference as a multiple of
 baseline).
@@ -326,7 +330,7 @@ baseline).
 
 ### 3.4 Metabolic acid–base perturbation
 
-Adding unmeasured strong anions (Eq. 15, the base-excess/pH lever) produced a graded metabolic acidosis — falling bicarbonate, base excess and pH — with secondary respiratory compensation (falling PCO₂) as open-loop ventilation responded (Table 4), demonstrating the Stewart solver's separation of the metabolic (SID/UMA → HCO₃⁻, BE) from the respiratory (ventilation → PCO₂) component. The same acidosis arises spontaneously from tissue oxygen debt via the lactate pathway (Eqs. 23–25), lactate entering Eq. 15 as a strong anion.
+Adding unmeasured strong anions (Eq. 16, the base-excess/pH lever) produced a graded metabolic acidosis — falling bicarbonate, base excess and pH — with secondary respiratory compensation (falling PCO₂) as open-loop ventilation responded (Table 4), demonstrating the Stewart solver's separation of the metabolic (SID/UMA → HCO₃⁻, BE) from the respiratory (ventilation → PCO₂) component. The same acidosis arises spontaneously from tissue oxygen debt via the lactate pathway (Eqs. 24–26), lactate entering Eq. 16 as a strong anion.
 
 **Table 4. Metabolic acidosis from added unmeasured anions** (UMA increment above baseline,
 mmol·L⁻¹).
@@ -342,7 +346,7 @@ converging envelope — see §4.4.)*
 
 ### 3.5 Respiratory distress and surfactant therapy
 
-In the preterm 28-week RDS scenario, surfactant (`administer_surfactant`, target maturity 0.9) drove progressive recruitment with coupled improvement in every downstream variable (Table 5): the open fraction rose from 0.50 to 1.0, lung elastance fell (compliance rose), diffusion rose and shunt fell, and arterial PO₂ rose from 54.6 to 74.3 mmHg with SpO₂ from 90.7 to 96.1 % (Eqs. 26–29). The response developed over minutes (τ_surf = 180 s) with the intended hysteresis; at baseline all four effector factors sat at unity, confirming neutrality in the untreated calibrated state.
+In the preterm 28-week RDS scenario, surfactant (`administer_surfactant`, target maturity 0.9) drove progressive recruitment with coupled improvement in every downstream variable (Table 5): the open fraction rose from 0.50 to 1.0, lung elastance fell (compliance rose), diffusion rose and shunt fell, and arterial PO₂ rose from 54.6 to 74.3 mmHg with SpO₂ from 90.7 to 96.1 % (Eqs. 27–30). The response developed over minutes (τ_surf = 180 s) with the intended hysteresis; at baseline all four effector factors sat at unity, confirming neutrality in the untreated calibrated state.
 
 **Table 5. Surfactant therapy time course** (preterm 28-week RDS; `probe_surfactant.mjs
 --scenario preterm_28wk --target 0.9`).
