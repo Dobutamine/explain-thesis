@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<svg width="342" height="338" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<path d="M 251.06 109.78 C 295.34 154.06 295.34 225.85 251.06 270.13 C 206.78 314.41 134.99 314.41 90.71 270.13 C 46.43 225.85 46.43 154.06 90.71 109.78 C 134.99 65.50 206.78 65.50 251.06 109.78" stroke-width="2.00" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2.00,4.00" fill="none"  />
+
+<path d="M 242.22 211.53 C 256.06 225.36 256.06 247.80 242.22 261.64 C 228.38 275.47 205.95 275.47 192.11 261.64 C 178.27 247.80 178.27 225.36 192.11 211.53 C 205.95 197.69 228.38 197.69 242.22 211.53" stroke-width="2.00" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2.00,4.00" fill="#f0f0f0"  />
+
+<path d="M 149.53 211.60 C 163.37 225.44 163.37 247.88 149.53 261.71 C 135.69 275.55 113.26 275.55 99.42 261.71 C 85.58 247.88 85.58 225.44 99.42 211.60 C 113.26 197.77 135.69 197.77 149.53 211.60" stroke-width="2.00" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2.00,4.00" fill="#f0f0f0"  />
+
+<path d="M 145.07 216.80 C 156.14 227.87 156.14 245.82 145.07 256.89 C 134.00 267.96 116.06 267.96 104.99 256.89 C 93.92 245.82 93.92 227.87 104.99 216.80 C 116.06 205.73 134.00 205.73 145.07 216.80" stroke-width="2.00" stroke="black" stroke-linecap="round" stroke-linejoin="round" fill="#dadada"  />
+
+<text x="113.37" y="241.58" font-family="Helvetica" font-size="12.00px" fill="black" opacity="1.00" font-weight="bold" >ALL</text>
+<path d="M 237.19 216.80 C 248.26 227.87 248.26 245.82 237.19 256.89 C 226.12 267.96 208.17 267.96 197.10 256.89 C 186.03 245.82 186.03 227.87 197.10 216.80 C 208.17 205.73 226.12 205.73 237.19 216.80" stroke-width="2.00" stroke="black" stroke-linecap="round" stroke-linejoin="round" fill="#dadada"  />
+
+<text x="204.81" y="241.58" font-family="Helvetica" font-size="12.00px" fill="black" opacity="1.00" font-weight="bold" >ALR</text>
+<path d="M 191.31 121.86 C 202.38 132.93 202.38 150.88 191.31 161.95 C 180.24 173.02 162.29 173.02 151.22 161.95 C 140.15 150.88 140.15 132.93 151.22 121.86 C 162.29 110.79 180.24 110.79 191.31 121.86" stroke-width="2.00" stroke="black" stroke-linecap="round" stroke-linejoin="round" fill="#dadada"  />
+
+<text x="162.93" y="146.65" font-family="Helvetica" font-size="12.00px" fill="black" opacity="1.00" font-weight="bold" >DS</text>
+<path d="M 160.41 168.10 L 135.88 210.65" stroke-width="2.00" stroke="black" stroke-linecap="round" stroke-linejoin="round" fill="none"  />
+
+<path d="M 182.11 168.10 L 206.29 210.65" stroke-width="2.00" stroke="black" stroke-linecap="round" stroke-linejoin="round" fill="none"  />
+
+<path d="M 158.88 167.26 L 165.97 181.44 L 151.80 181.44 Z M 158.88 167.26" transform="rotate(208.15,156.92,177.30)" stroke-width="2.00" stroke="black" stroke-linecap="round" stroke-linejoin="round" fill="white"  />
+
+<path d="M 146.89 181.59 L 153.98 195.76 L 139.80 195.76 Z M 146.89 181.59" transform="rotate(27.96,144.91,191.61)" stroke-width="2.00" stroke="black" stroke-linecap="round" stroke-linejoin="round" fill="white"  />
+
+<path d="M 183.14 167.33 L 190.23 181.50 L 176.05 181.50 Z M 183.14 167.33" transform="rotate(152.77,185.20,177.30)" stroke-width="2.00" stroke="black" stroke-linecap="round" stroke-linejoin="round" fill="white"  />
+
+<path d="M 195.22 181.55 L 202.31 195.72 L 188.14 195.72 Z M 195.22 181.55" transform="rotate(332.57,197.26,191.53)" stroke-width="2.00" stroke="black" stroke-linecap="round" stroke-linejoin="round" fill="white"  />
+
+<path d="M 191.31 19.84 C 202.38 30.91 202.38 48.85 191.31 59.92 C 180.24 70.99 162.29 70.99 151.22 59.92 C 140.15 48.85 140.15 30.91 151.22 19.84 C 162.29 8.77 180.24 8.77 191.31 19.84" stroke-width="2.00" stroke="black" stroke-linecap="round" stroke-linejoin="round" fill="#dadada"  />
+
+<text x="151.00" y="44.62" font-family="Helvetica" font-size="12.00px" fill="black" opacity="1.00" font-weight="bold" >MOUTH</text>
+<path d="M 171.26 113.56 L 171.26 68.23" stroke-width="2.00" stroke="black" stroke-linecap="round" stroke-linejoin="round" fill="none"  />
+
+<path d="M 171.47 80.03 L 178.56 94.21 L 164.39 94.21 Z M 171.47 80.03" transform="rotate(180.79,171.38,87.17)" stroke-width="2.00" stroke="black" stroke-linecap="round" stroke-linejoin="round" fill="white"  />
+
+<path d="M 171.21 93.43 L 178.29 107.60 L 164.12 107.60 Z M 171.21 93.43" transform="rotate(359.79,171.23,100.53)" stroke-width="2.00" stroke="black" stroke-linecap="round" stroke-linejoin="round" fill="white"  />
+
+<text x="75.00" y="209.05" font-family="Helvetica" font-size="12.00px" fill="black" opacity="1.00" font-weight="bold" >LL</text>
+<text x="251.00" y="209.63" font-family="Helvetica" font-size="12.00px" fill="black" opacity="1.00" font-weight="bold" >RL</text>
+<text x="145.84" y="323.93" font-family="Helvetica" font-size="12.00px" fill="black" opacity="1.00" font-weight="bold" >THORAX</text>
+
+</svg>
