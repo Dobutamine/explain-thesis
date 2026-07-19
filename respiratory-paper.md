@@ -66,10 +66,10 @@ coefficient, *V* the compartment gas volume (L) and *V*ᵤ,eff the effective uns
 
 $$P = p_{\text{in}} + p_{\text{ext}} + p_{\text{cc}} + p_{\text{mus}} + P_{\text{atm}}, \quad P_{\text{rel}} = P - P_{\text{atm}} \tag{2}$$
 
-with *P*_atm = 760 mmHg, *p*_cc the pressure imposed by the enclosing thorax, and *p*_mus the
-respiratory-muscle pressure (Section 2.2.2); *p*_ext, *p*_cc and *p*_mus are additive perturbations reset to zero each step.
+with *P*_atm = 760 mmHg, *p*_ext the pressure imposed by the enclosing thorax, and *p*_mus the
+respiratory-muscle pressure (Section 2.2.2); *p*_ext, *p*_cc and *p*_mus are additive perturbations reset to zero each step as they are recalculated every model step.
 
-The thorax is a `Container`: an elastic shell whose volume is the sum of the (enabled) contained
+The thorax is a `Container`: an elastic shell whose volume is the sum of the contained
 compartment volumes and which transmits its own recoil pressure back onto each contained
 compartment as external pressure,
 

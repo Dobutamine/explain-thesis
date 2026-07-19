@@ -6,8 +6,7 @@ Antonius TAJ, van Meurs WL, Westerhof BE, de Boode WP
 autoregulation [P3a]; homeostatic-regulation subsystems [P3b]; devices [P4]; integrated
 flagship [P5]; AI-parameterization [P6]; congenital heart disease [P7]). Target journal:
 Pediatric Research (Basic Science Article). Markdown working draft converted from the master
-Word manuscript `ExplainCircPaper(27012026)_WPdB_TA_WvM.docx`. The AI-parameterization method carries
-a compact in-body pointer (§2.3) plus the AI-use disclosure; its full highlight and figure are moved to
+Word manuscript `ExplainCircPaper(27012026)_WPdB_TA_WvM.docx`. The AI-parameterization method carries a compact in-body pointer (§2.3) plus the AI-use disclosure; its full highlight and figure are moved to
 Supplementary Methods S1 / Supplemental Fig. S1 (see `P1_supplement_AI-parameterization.md`; refs
 [24]–[26]). Equations are transcribed to the
 series' Unicode-blockquote convention and are to be re-keyed as native Word (OMML) objects at
