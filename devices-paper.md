@@ -253,6 +253,8 @@ See the parameterization companion paper [P6] for how device settings and patien
 the AI-assisted calibration pipeline. The devices run in the same insertion-ordered step loop as the patient models, sharing the
 gas and blood compartments so that support and physiology are solved together.
 
+**AI-use disclosure.** A large language model (Claude, Anthropic) is used as a component of the parameterization method: it interprets clinical inputs and emits validated, allowlisted specifications. It performs no numerical fitting, does not modify the model's equations or state, and is not used to generate the scientific content or text of this study; no authorship is attributed to it.
+
 ---
 
 ## 3. Results — illustrative simulations

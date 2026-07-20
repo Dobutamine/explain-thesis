@@ -148,7 +148,7 @@ $$(t\mathrm{O_2})_{\text{blood}} \leftarrow \frac{(t\mathrm{O_2})_{\text{blood}}
 and analogously for CO₂. Before each exchange the blood partial pressures are refreshed by the solver of Section 2.2.4. Conducting-airway gas transport (`GasDiffusor`) and blood–blood diffusion (`BloodDiffusor`, used for the placenta in a separate "other systems" paper) use the identical partial-pressure-driven flux and mass-conserving update (Eqs. 13–14); the blood diffusor additionally moves arbitrary solutes down their gradients.
 
 The alveolar O₂ diffusion constant `dif_o2` is the primary calibration lever for arterial PO₂/SpO₂
-(Section 2.4).
+(Section 2.3).
 
 #### 2.2.4 Blood-gas transport and acid–base chemistry (keystone)
 
@@ -177,7 +177,7 @@ bicarbonate and carbonate, and buffered by albumin and phosphate (their pH-depen
 
 $$g([\mathrm{H^+}]) = [\mathrm{H^+}] + \mathrm{SID} - [\mathrm{HCO_3^-}] - 2[\mathrm{CO_3^{2-}}] - [\mathrm{OH^-}] - A^- - [\mathrm{UMA}] = 0 \tag{17}$$
 
-where UMA is the concentration of unmeasured/unidentified strong anions — the calibration lever for base excess and pH (Section 2.4). The dissociation constants, the bounded [H⁺] root-finder and the solver's verification against 1864 neonatal blood-gas samples are given in the published paper [4]. From the converged solution the base excess is computed by the Van Slyke expression [9]
+where UMA is the concentration of unmeasured/unidentified strong anions — the calibration lever for base excess and pH (Section 2.3). The dissociation constants, the bounded [H⁺] root-finder and the solver's verification against 1864 neonatal blood-gas samples are given in the published paper [4]. From the converged solution the base excess is computed by the Van Slyke expression [9]
 
 $$\mathrm{BE} = \big([\mathrm{HCO_3^-}] - 25.1 + (2.3\,\mathrm{Hb} + 7.7)(\mathrm{pH} - 7.4)\big)(1 - 0.023\,\mathrm{Hb}) \tag{18}$$
 
@@ -257,15 +257,15 @@ so derecruitment (negative *r*) simultaneously stiffens the lung, lowers FRC, im
 
 EXPLAIN is a framework-agnostic JavaScript/TypeScript engine running in a Web Worker, with declarative JSON model definitions and a real-time step loop, freely available at https://explain-modeling.com; the complete, annotated engine source code is publicly available at https://github.com/Dobutamine/explain-engine and archived with a persistent identifier at https://doi.org/10.5281/zenodo.21389097 [15]. The respiratory models run in the same insertion-ordered step loop as the circulation, sharing the blood compartments so that gas exchange, transport, metabolism and acid–base are solved together each step.
 
-### 2.4 AI-assisted patient-specific parameterization (pointer)
+The patient-specific respiratory and acid–base parameters used in this paper were not tuned by hand. A large language model interprets the available clinical targets into a validated, allowlisted specification, and a deterministic calibrator then fits the model by driving one physiologically interpretable lever per target to a clinician-meaningful tolerance; the language model performs no numerical fitting and never edits equations or state. For this paper the pairings are arterial PO₂/SpO₂ via alveolar O₂ diffusion, PaCO₂ via central ventilatory drive, and base excess and pH via Stewart unmeasured strong anions. The per-target lever assignments, their tolerances and the full method are given in a separate parameterization paper.
 
-Patient-specific respiratory and acid–base parameters are not hand-tuned but set by the AI-assisted closed-loop pipeline described in full in a separate parameterization paper: a large language model interprets the clinical targets into a validated specification, and a deterministic calibrator drives one physiologically interpretable lever per target to a clinician-meaningful tolerance. For this paper the levers are: **alveolar O₂ diffusion** *D*_O₂ (`dif_o2`) → arterial PO₂/SpO₂ (positive); **central ventilatory drive** *m*_ref (`minute_volume_ref`) → arterial PCO₂ (negative — lowering drive raises PCO₂ because the chemoreflex defends the setpoint); and **Stewart unmeasured anions** UMA (`uma`) → base excess and pH (negative). Default tolerances: PO₂ ±6, PCO₂ ±4 mmHg, pH ±0.03, base excess ±1.5 mmol·L⁻¹.
+**AI-use disclosure.** A large language model (Claude, Anthropic) is used as a component of the parameterization *method*: it interprets clinical inputs and emits validated, allowlisted specifications. It performs no numerical fitting, does not modify the model's equations or state, and is not used to generate the scientific content or text of this study; no authorship is attributed to it.
 
 ---
 
 ## 3. Results — illustrative simulations
 
-Each experiment ran headlessly against the calibrated term-neonate baseline (`term_neonate.json`; for surfactant, the preterm 28-week RDS scenario `preterm_28wk.json`) using the reproducible harness and probe scripts. The baseline was warmed to steady state and signals cycle-averaged over the reporting window; all values come from the engine's acid–base/oxygen solver (`BloodComposition.js`), not prescribed. Mechanism sweeps (§3.2–3.4) ran with the autonomic chemoreflex disabled to show the pure mechanism; in the closed loop the chemoreflex attenuates the CO₂ response — why ventilatory drive, not diffusion, is the PCO₂ lever (Section 2.4). Scripts: `probe_vitals.mjs` (§3.1), `probe_respiratory.mjs` (§3.2–3.4), `probe_surfactant.mjs` (§3.5).
+Each experiment ran headlessly against the calibrated term-neonate baseline (`term_neonate.json`; for surfactant, the preterm 28-week RDS scenario `preterm_28wk.json`) using the reproducible harness and probe scripts. The baseline was warmed to steady state and signals cycle-averaged over the reporting window; all values come from the engine's acid–base/oxygen solver (`BloodComposition.js`), not prescribed. Mechanism sweeps (§3.2–3.4) ran with the autonomic chemoreflex disabled to show the pure mechanism; in the closed loop the chemoreflex attenuates the CO₂ response — why ventilatory drive, not diffusion, is the PCO₂ lever (Section 2.3). Scripts: `probe_vitals.mjs` (§3.1), `probe_respiratory.mjs` (§3.2–3.4), `probe_surfactant.mjs` (§3.5).
 
 ### 3.1 Baseline gas exchange and acid–base status
 
@@ -289,7 +289,7 @@ term_neonate --seconds 120`.)*
 
 ### 3.2 Oxygenation vs inspired oxygen fraction and alveolar diffusion
 
-Stepping the inspired oxygen fraction raised arterial PO₂ monotonically with the expected saturating rise of SpO₂ (Table 2a), while PCO₂ was essentially unchanged — the model makes oxygenation, not CO₂ clearance, respond to FiO₂ (Eqs. 5, 13, 21–23). Independently scaling the alveolar O₂ diffusion constant gave a saturating rise in PO₂ from a diffusion-limited regime toward a perfusion/ventilation-limited ceiling (Table 2b), demonstrating the *D*_O₂ → PO₂/SpO₂ lever (Section 2.4).
+Stepping the inspired oxygen fraction raised arterial PO₂ monotonically with the expected saturating rise of SpO₂ (Table 2a), while PCO₂ was essentially unchanged — the model makes oxygenation, not CO₂ clearance, respond to FiO₂ (Eqs. 5, 13, 21–23). Independently scaling the alveolar O₂ diffusion constant gave a saturating rise in PO₂ from a diffusion-limited regime toward a perfusion/ventilation-limited ceiling (Table 2b), demonstrating the *D*_O₂ → PO₂/SpO₂ lever (Section 2.3).
 
 **Table 2a. Arterial oxygenation vs FiO₂** (alveolar diffusion at baseline). PCO₂ held ≈ 39.8 mmHg
 throughout.
@@ -368,7 +368,7 @@ In the preterm 28-week RDS scenario, surfactant (`administer_surfactant`, target
 
 The subsystem is distinctive less in any single component than in their integration. Its elements are grounded in established physiology — elastance-based gas compartments and chest-wall mechanics, Fick alveolar–capillary diffusion, a physicochemical (Stewart) treatment of acid–base equilibrium (published separately [4]), a Hill dissociation curve with the classical P₅₀-shifting factors, and a recruitment model of surfactant-dependent mechanics. What the model adds is to solve all of these together, in real time, in one set of blood compartments shared with the circulation. Because O₂ and CO₂ circulate as total contents and are converted to partial pressures, pH, bicarbonate and saturation everywhere blood exists, the arterial blood gas is not an assigned output but an emergent property: it moves only when ventilation, perfusion, diffusion or metabolism moves. That is what makes the model explanatory rather than descriptive.
 
-A second, series-wide element of originality is how the model is fitted to a patient. Lumped-parameter models expose many parameters against few measurements, and hand-tuning is slow, irreproducible and hard to audit. Here the respiratory and acid–base parameters are set by the AI-assisted pipeline of a separate paper: a large language model interprets the clinical targets and a deterministic calibrator drives one interpretable lever per target onto its value. The lever structure is itself encoded physiology — alveolar diffusion drives oxygenation, ventilatory drive drives CO₂, and unmeasured strong anions drive base excess and pH — chosen to respect the model's control loops rather than fight them (Section 2.4). Because every automated adjustment uses the same bounded, schema-checked parameters as a manual edit, instantiation is rapid and reproducible.
+A second, series-wide element of originality is that EXPLAIN is fitted to a patient not by hand but by an AI-assisted, closed-loop pipeline (separate parameterization paper), which makes patient-specific instantiation reproducible and keeps every automated adjustment within the same bounds as a manual edit.
 
 ### 4.2 Model validity
 
@@ -425,6 +425,7 @@ The respiratory subsystem of EXPLAIN gives a transparent, real-time, mechanistic
 15. Antonius T. *Explain: a whole-body physiological simulation engine* (Version v0.1.0) [Software]. Zenodo; 2026. doi:10.5281/zenodo.21389097 (concept/all-versions DOI). Source: https://github.com/Dobutamine/explain-engine (MIT). Interactive model: https://explain-modeling.com.
 16. Wagner PD, Saltzman HA, West JB. Measurement of continuous distributions of ventilation–perfusion ratios: theory. *J Appl Physiol.* 1974;36(5):588–99. PMID 4826323. doi:10.1152/jappl.1974.36.5.588.
 
-*Full working pool and provenance notes: `_references.md`. The AI-use disclosure and the
-parameterization-method citations are carried by a separate paper; this paper's §2.4 is a
-pointer, so it does not re-cite the LLM/software-method sources.*
+*Full working pool and provenance notes: `_references.md`. This paper carries only the compact
+AI-parameterization pointer and the AI-use disclosure in §2.3; the full parameterization-method
+citations (the LLM/software-method sources) are carried by the separate parameterization paper,
+so they are not re-cited here.*
